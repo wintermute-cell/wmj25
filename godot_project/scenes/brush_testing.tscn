@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="1_3mqiv"]
-[ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scenes/brush_testing.gd" id="1_m53fp"]
+[ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scripts/brush.gd" id="1_m53fp"]
 [ext_resource type="Texture2D" uid="uid://cj4jok4oosfyr" path="res://test_360p_bg.png" id="2_n3blh"]
 [ext_resource type="Curve" uid="uid://bmr62cjawl152" path="res://brush_config/brush_speed_to_size_curve.tres" id="4_6y5y0"]
 [ext_resource type="Texture2D" uid="uid://bbj1d3ffmt23a" path="res://brush_config/splotch.png" id="4_ojqti"]

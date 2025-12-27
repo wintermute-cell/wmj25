@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameManager="*res://scripts/game_manager.gd"
-SceneLoader="*res://scripts/scene_loader.gd"
+GameManager="*res://scripts/management/game_manager.gd"
+SceneLoader="*res://scripts/management/scene_loader.gd"
 TransitionLayer="*res://scenes/transition_layer.tscn"
 LoadingScreen="*res://scenes/loading_screen.tscn"
 
