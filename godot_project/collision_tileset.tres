@@ -1,0 +1,12 @@
+[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://dklv8f3jsr50l"]
+
+[ext_resource type="Texture2D" uid="uid://0xl0l4kdui5m" path="res://wall_tiles.png" id="1_1638o"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_86bcr"]
+texture = ExtResource("1_1638o")
+texture_region_size = Vector2i(4, 4)
+0:0/0 = 0
+
+[resource]
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_86bcr")

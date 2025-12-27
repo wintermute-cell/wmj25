@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=16 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="1_3mqiv"]
 [ext_resource type="Texture2D" uid="uid://bw8360hvlir7n" path="res://space_bg.png" id="1_788mp"]
@@ -8,6 +8,17 @@
 [ext_resource type="Curve" uid="uid://buhtwsalv8a3i" path="res://brush_config/brush_speed_to_sploch_curve.tres" id="5_fkxdt"]
 [ext_resource type="Curve" uid="uid://db8xt4fm7yjw0" path="res://brush_config/brush_speed_to_pool_curve.tres" id="6_3mqiv"]
 [ext_resource type="Texture2D" uid="uid://bqdvxjy8ufhmn" path="res://ghost.png" id="7_fkxdt"]
+[ext_resource type="Script" uid="uid://6dt6me7o43sa" path="res://scripts/player.gd" id="8_jh5vf"]
+[ext_resource type="Script" uid="uid://b1owqutpiap0w" path="res://scripts/enemy.gd" id="10_6iyv3"]
+[ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_6iyv3"]
+[ext_resource type="Texture2D" uid="uid://cyga5l6mm4dxm" path="res://enemy.png" id="11_nyqdd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nyqdd"]
+size = Vector2(46, 268)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6iyv3"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uhfjk"]
 
 [node name="BrushTesting" type="Node2D"]
 
@@ -33,7 +44,23 @@ render_target_update_mode = 4
 texture = ExtResource("1_788mp")
 centered = false
 
-[node name="Node2D" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+[node name="Wall" type="StaticBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+collision_mask = 0
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/SubViewportContainer/SubViewport/Wall"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 297.33334
+offset_top = 42.66667
+offset_right = 342.33334
+offset_bottom = 309.33337
+grow_vertical = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Wall"]
+position = Vector2(320.33334, 176.66667)
+shape = SubResource("RectangleShape2D_nyqdd")
+
+[node name="Brush" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 script = ExtResource("1_m53fp")
 brush_texture = ExtResource("4_ojqti")
 splotch_texture = ExtResource("4_ojqti")
@@ -41,11 +68,39 @@ speed_to_size_curve = ExtResource("4_6y5y0")
 speed_to_splotch_curve = ExtResource("5_fkxdt")
 speed_to_pool_curve = ExtResource("6_3mqiv")
 
-[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
-position = Vector2(390, 129.33334)
+[node name="Player" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport" groups=["player"]]
+position = Vector2(81.595, 66.795)
+script = ExtResource("8_jh5vf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+shape = SubResource("CircleShape2D_6iyv3")
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 texture = ExtResource("7_fkxdt")
 
+[node name="Enemy" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+script = ExtResource("10_6iyv3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy"]
+shape = SubResource("CircleShape2D_uhfjk")
+
+[node name="DetectionArea" type="Area2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy"]
+collision_layer = 4
+collision_mask = 10
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy/DetectionArea"]
+shape = SubResource("CircleShape2D_uhfjk")
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy"]
+texture = ExtResource("11_nyqdd")
+
+[node name="PaintCollisionManager" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport" node_paths=PackedStringArray("brush", "wall_root")]
+script = ExtResource("11_6iyv3")
+brush = NodePath("../Brush")
+wall_root = NodePath("..")
+
 [node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("1_3mqiv")]
+visible = false
 
 [node name="Label" type="Label" parent="CanvasLayer"]
 offset_left = 3.0
