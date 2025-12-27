@@ -107,6 +107,9 @@ func start_ingame_music():
 func resume_ingame_music():
 	audio_ingame_music.play(ingame_music_position)
 
+func sound_player_died():
+	audio_dead.play()
+
 
 func set_music_volume(volume: float):
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)

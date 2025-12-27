@@ -20,8 +20,8 @@ const PLAYER_LAYER = 2
 
 
 func _ready():
-	collision_layer = 1 << (PLAYER_LAYER - 1)  # L2
-	collision_mask = 1 << (WALL_LAYER - 1)  # coll with walls (L1)
+	collision_layer = 1 << (PLAYER_LAYER - 1) # L2
+	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
 
 	health = max_health
 
@@ -47,6 +47,7 @@ func _physics_process(delta: float):
 func take_damage(amount: float):
 	health -= amount
 	if health <= 0:
+		GameManager.sound_player_died()
 		die()
 
 
