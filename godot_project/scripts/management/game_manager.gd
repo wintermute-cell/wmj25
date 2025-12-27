@@ -95,6 +95,7 @@ func load_audio():
 	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
 
+
 	audio_dead.stream = preload("res://audio/dead.mp3")
 	audio_dead.bus = "Soundeffects"
 	add_child(audio_dead)
@@ -103,6 +104,7 @@ func load_audio():
 func start_ingame_music():
 	await audio_start_game.finished
 	audio_ingame_music.play(ingame_music_position)
+
 
 func resume_ingame_music():
 	audio_ingame_music.play(ingame_music_position)
