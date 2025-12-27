@@ -10,6 +10,9 @@ var current_state: GameState = GameState.MENU
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_dead: AudioStreamPlayer = AudioStreamPlayer.new()
+
+
 var ingame_music_position: float = 0.0
 
 func _ready():
@@ -23,7 +26,8 @@ func _ready():
 
 func start_game():
 	audio_start_game.play()
-	audio_ingame_music.play(ingame_music_position)
+	start_ingame_music()
+
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -41,8 +45,10 @@ func return_to_menu():
 
 
 func restart_game():
+	audio_ingame_music.stop()
 	ingame_music_position = 0.0
-	audio_ingame_music.play(ingame_music_position)
+	audio_start_game.play()
+	start_ingame_music()
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -67,7 +73,7 @@ func pause_game():
 
 
 func resume_game():
-	audio_ingame_music.play(ingame_music_position)
+	resume_ingame_music()
 	audio_click_menu_item.play()
 	if current_state == GameState.PAUSED:
 		current_state = GameState.PLAYING
@@ -85,9 +91,28 @@ func load_audio():
 	audio_click_menu_item.bus = "Soundeffects"
 	add_child(audio_click_menu_item)
 
-	audio_ingame_music.stream = preload("res://audio/noodles.mp3")
-	audio_ingame_music.bus = "Music"
+	var random = randi() % 50
+	print(random)
+	if random == 0: # NOODLES :)
+		audio_ingame_music.stream = preload("res://audio/noodles.mp3")
+		audio_ingame_music.bus = "Music"
+	else:
+		audio_ingame_music.stream = preload("res://audio/music.mp3")
+		audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
+
+	audio_dead.stream = preload("res://audio/dead.mp3")
+	audio_dead.bus = "Soundeffects"
+	add_child(audio_dead)
+
+
+func start_ingame_music():
+	await audio_start_game.finished
+	audio_ingame_music.play(ingame_music_position)
+
+func resume_ingame_music():
+	audio_ingame_music.play(ingame_music_position)
+
 
 func set_music_volume(volume: float):
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
