@@ -91,14 +91,8 @@ func load_audio():
 	audio_click_menu_item.bus = "Soundeffects"
 	add_child(audio_click_menu_item)
 
-	var random = randi() % 50
-	print(random)
-	if random == 0: # NOODLES :)
-		audio_ingame_music.stream = preload("res://audio/noodles.mp3")
-		audio_ingame_music.bus = "Music"
-	else:
-		audio_ingame_music.stream = preload("res://audio/music.mp3")
-		audio_ingame_music.bus = "Reverb"
+	audio_ingame_music.stream = preload("res://audio/music.mp3")
+	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
 
 	audio_dead.stream = preload("res://audio/dead.mp3")
