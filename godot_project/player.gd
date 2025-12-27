@@ -17,7 +17,6 @@ func _physics_process(delta: float) -> void:
 	
 func check_collisions() -> void:
 	for i in get_slide_collision_count():
-		print(i)
 		var collisionObject = get_slide_collision(i).get_collider()
 		if collisionObject.is_in_group("Walls"):
 			pass
