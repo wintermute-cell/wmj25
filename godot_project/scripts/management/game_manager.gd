@@ -4,11 +4,16 @@ extends Node
 const MAIN_MENU_PATH = "res://scenes/main_menu.tscn"
 const GAME_PATH = "res://scenes/brush_testing.tscn"
 
-enum GameState { MENU, PLAYING, PAUSED, LOADING }
+enum GameState {MENU, PLAYING, PAUSED, LOADING}
 var current_state: GameState = GameState.MENU
 
+@onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
+var ingame_music_position: float = 0.0
 
 func _ready():
+	load_audio()
 	# ensure we start in the correct state
 	if get_tree().current_scene:
 		var scene_path = get_tree().current_scene.scene_file_path
@@ -17,6 +22,8 @@ func _ready():
 
 
 func start_game():
+	audio_start_game.play()
+	audio_ingame_music.play(ingame_music_position)
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -24,6 +31,9 @@ func start_game():
 
 
 func return_to_menu():
+	audio_start_game.stop() # just in case its still playing
+	ingame_music_position = 0.0
+	audio_ingame_music.stop()
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -31,6 +41,8 @@ func return_to_menu():
 
 
 func restart_game():
+	ingame_music_position = 0.0
+	audio_ingame_music.play(ingame_music_position)
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -46,12 +58,30 @@ func on_scene_loaded(scene_path: String):
 
 
 func pause_game():
+	ingame_music_position = audio_ingame_music.get_playback_position()
+	audio_ingame_music.stop()
+	audio_click_menu_item.play()
 	if current_state == GameState.PLAYING:
 		current_state = GameState.PAUSED
 		get_tree().paused = true
 
 
 func resume_game():
+	audio_ingame_music.play(ingame_music_position)
+	audio_click_menu_item.play()
 	if current_state == GameState.PAUSED:
 		current_state = GameState.PLAYING
 		get_tree().paused = false
+
+func load_audio():
+	audio_start_game.stream = preload("res://audio/newgame.mp3")
+	audio_start_game.bus = "Soundeffects"
+	add_child(audio_start_game)
+
+	audio_click_menu_item.stream = preload("res://audio/chime.mp3")
+	audio_click_menu_item.bus = "Soundeffects"
+	add_child(audio_click_menu_item)
+
+	audio_ingame_music.stream = preload("res://audio/noodles.mp3")
+	audio_ingame_music.bus = "Music"
+	add_child(audio_ingame_music)
