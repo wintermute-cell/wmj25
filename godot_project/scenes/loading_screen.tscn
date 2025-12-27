@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=3 uid="uid://dadiby04sgeut"]
+
+[ext_resource type="FontFile" uid="uid://chmwnlscs8x44" path="res://adventurers_scribbles.ttf" id="1_ep5rh"]
+[ext_resource type="Script" uid="uid://cyjmr4jhmggw7" path="res://scripts/ui/loading_screen.gd" id="1_hprjd"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_hprjd"]
+font = ExtResource("1_ep5rh")
+font_size = 64
+
+[node name="LoadingScreen" type="CanvasLayer"]
+script = ExtResource("1_hprjd")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08210092, 0.07658861, 0.06280818, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Loading uwu"
+label_settings = SubResource("LabelSettings_hprjd")
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/CenterContainer/VBoxContainer"]
+layout_mode = 2

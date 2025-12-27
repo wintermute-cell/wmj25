@@ -1,11 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=9 format=3 uid="uid://dn3ral11lw7nj"]
 
+[ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="1_3mqiv"]
 [ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scenes/brush_testing.gd" id="1_m53fp"]
 [ext_resource type="Texture2D" uid="uid://cj4jok4oosfyr" path="res://test_360p_bg.png" id="2_n3blh"]
 [ext_resource type="Curve" uid="uid://bmr62cjawl152" path="res://brush_config/brush_speed_to_size_curve.tres" id="4_6y5y0"]
 [ext_resource type="Texture2D" uid="uid://bbj1d3ffmt23a" path="res://brush_config/splotch.png" id="4_ojqti"]
 [ext_resource type="Curve" uid="uid://buhtwsalv8a3i" path="res://brush_config/brush_speed_to_sploch_curve.tres" id="5_fkxdt"]
 [ext_resource type="Curve" uid="uid://db8xt4fm7yjw0" path="res://brush_config/brush_speed_to_pool_curve.tres" id="6_3mqiv"]
+[ext_resource type="Texture2D" uid="uid://bqdvxjy8ufhmn" path="res://ghost.png" id="7_fkxdt"]
 
 [node name="BrushTesting" type="Node2D"]
 
@@ -38,6 +40,12 @@ splotch_texture = ExtResource("4_ojqti")
 speed_to_size_curve = ExtResource("4_6y5y0")
 speed_to_splotch_curve = ExtResource("5_fkxdt")
 speed_to_pool_curve = ExtResource("6_3mqiv")
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+position = Vector2(390, 129.33334)
+texture = ExtResource("7_fkxdt")
+
+[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("1_3mqiv")]
 
 [node name="Label" type="Label" parent="CanvasLayer"]
 offset_left = 3.0
