@@ -11,10 +11,20 @@ config_version=5
 [application]
 
 config/name="wmj25"
+run/main_scene="uid://dn3ral11lw7nj"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/resizable=false
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
