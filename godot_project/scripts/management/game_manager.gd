@@ -74,6 +74,9 @@ func resume_game():
 		get_tree().paused = false
 
 func load_audio():
+	set_music_volume(0.5)
+	set_soundeffects_volume(0.5)
+
 	audio_start_game.stream = preload("res://audio/newgame.mp3")
 	audio_start_game.bus = "Soundeffects"
 	add_child(audio_start_game)
@@ -85,3 +88,11 @@ func load_audio():
 	audio_ingame_music.stream = preload("res://audio/noodles.mp3")
 	audio_ingame_music.bus = "Music"
 	add_child(audio_ingame_music)
+
+func set_music_volume(volume: float):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
+
+func set_soundeffects_volume(volume: float, replay_click: bool = false):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)
+	if replay_click:
+		audio_click_menu_item.play()

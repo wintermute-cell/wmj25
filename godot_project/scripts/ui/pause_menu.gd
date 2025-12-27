@@ -5,14 +5,24 @@ extends CanvasLayer
 @onready var resume_button: Button = $Container/CenterContainer/Panel/VBoxContainer/ResumeButton
 @onready var restart_button: Button = $Container/CenterContainer/Panel/VBoxContainer/RestartButton
 @onready var menu_button: Button = $Container/CenterContainer/Panel/VBoxContainer/MenuButton
-
+@onready var music_volume_slider: HSlider = $Container/CenterContainer/Panel/VBoxContainer/MCMusic/MusicSettings/MusicVolumeSlider
+@onready var soundeffects_volume_slider: HSlider = $Container/CenterContainer/Panel/VBoxContainer/MCSoundeffects/SoundEffectSettings/SoundeffectsVolumeSlider
 
 func _ready():
+	# connect signals for volume sliders
+	music_volume_slider.value_changed.connect(func(value):
+		GameManager.set_music_volume(value)
+	)
+	soundeffects_volume_slider.value_changed.connect(func(value):
+		GameManager.set_soundeffects_volume(value, true)
+	)
+
+
 	layer = 98
 
 	# start hidden
 	visible = false
-	process_mode = Node.PROCESS_MODE_ALWAYS  # work even when paused
+	process_mode = Node.PROCESS_MODE_ALWAYS # work even when paused
 
 	resume_button.pressed.connect(_on_resume_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
@@ -20,7 +30,7 @@ func _ready():
 
 
 func _input(event):
-	if event.is_action_pressed("ui_cancel"):  # ESC
+	if event.is_action_pressed("ui_cancel"): # ESC
 		if visible:
 			_on_resume_pressed()
 		else:
