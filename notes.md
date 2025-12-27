@@ -1,7 +1,7 @@
 - music
 - sfx
 - game implementation
-    - paint stroke drawing
+    <!-- - paint stroke drawing -->
     - world clipping
     - menuführung
     - game loading
