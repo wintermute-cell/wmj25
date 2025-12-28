@@ -1,11 +1,15 @@
 extends CharacterBody2D
 
-## speed in px/second
-@export var speed: float = 75.0
+
+enum EnemyType {BASIC, DASHER}
+
 
 # preload particle effect
 const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
 
+## speed in px/second
+@export var speed: float = 75.0
+@export var enemy_type: int = EnemyType.BASIC
 ## damage dealt per second when overlapping
 @export var damage_per_second: float = 18.0
 
@@ -15,9 +19,18 @@ const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
 ## ref to player node (autofound if not set)
 @export var player: CharacterBody2D
 
+
 # player overlap detection (via Area2D child)
 var player_detection_area: Area2D
 var is_touching_player: bool = false
+
+@onready var dash_timer: Timer = $DashTimer
+var dash_cooldown: float = 5.0
+var dash_duration: float = 0.5
+var dash_speed: float = 200.0
+var dasher_base_speed: float = 50.0
+var is_dashing: bool = false
+var last_direction: Vector2 = Vector2.ZERO
 
 # coll layers
 const WALL_LAYER = 1
@@ -27,17 +40,26 @@ const ENEMY_LAYER = 3
 
 func _ready():
 	# set up coll layers
-	collision_layer = 1 << (ENEMY_LAYER - 1)  # L3
-	collision_mask = 1 << (WALL_LAYER - 1)  # coll with walls (L1)
+	collision_layer = 1 << (ENEMY_LAYER - 1) # L3
+	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
 
 	# add to enemies group for crunch signal
 	add_to_group("enemies")
 
+
+	# set up dash timer for dasher enemies
+	dash_timer.connect("timeout", dash_towards_player)
+	if (enemy_type == EnemyType.DASHER):
+		dash_timer.wait_time = dash_cooldown
+		dash_timer.one_shot = false
+		dash_timer.start(dash_cooldown)
+
+
 	# set up player detection area
 	player_detection_area = get_node_or_null("DetectionArea")
 	if player_detection_area and player_detection_area is Area2D:
-		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1)  # L3
-		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1)  # detect player on L2
+		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1) # L3
+		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1) # detect player on L2
 
 		player_detection_area.body_entered.connect(_on_body_entered)
 		player_detection_area.body_exited.connect(_on_body_exited)
@@ -52,8 +74,13 @@ func _ready():
 func _physics_process(delta: float):
 	# chase player if exists
 	if player != null and is_instance_valid(player):
-		var direction = (player.global_position - global_position).normalized()
+		var direction: Vector2
+		if not is_dashing:
+			direction = (player.global_position - global_position).normalized()
+		else:
+			direction = last_direction
 		velocity = direction * speed
+		last_direction = direction
 	else:
 		velocity = Vector2.ZERO
 
@@ -82,6 +109,24 @@ func _on_new_collision_created(new_polygons: Array[PackedVector2Array]):
 		if does_enemy_overlap_polygon(polygon):
 			crunch()
 			return
+
+
+func change_enemy_type(new_type: int):
+	if new_type == 1:
+		enemy_type = EnemyType.DASHER
+		speed = 50.0
+		damage_per_second = 30.0
+		scale = Vector2.ONE * 2.0
+
+
+func dash_towards_player():
+	if player != null and is_instance_valid(player):
+		is_dashing = true
+		speed = dash_speed
+		await get_tree().create_timer(dash_duration).timeout
+		speed = dasher_base_speed
+		dash_timer.wait_time = dash_cooldown
+		is_dashing = false
 
 
 func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
@@ -125,7 +170,7 @@ func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 
 
 func crunch():
-	var points = 100  # TODO: calc based on enemy type
+	var points = 100 # TODO: calc based on enemy type
 
 	# spawn crush effect
 	var effect = CRUSH_PARTICLES.instantiate()

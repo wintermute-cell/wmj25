@@ -66,6 +66,19 @@ func spawn_enemy():
 		return
 
 	var enemy = enemy_scene.instantiate()
+	# change enemy type for variety (optional)
+	var enemy_type_roll: int = 0
+	if elapsed_time > 30.0:
+		enemy_type_roll = randi() % 10
+	if elapsed_time > 60.0:
+		enemy_type_roll = randi() % 8
+	if elapsed_time > 90.0:
+		enemy_type_roll = randi() % 6
+	
+	if enemy_type_roll == 1:
+		enemy.change_enemy_type(enemy_type_roll)
+
+
 	enemy.global_position = get_random_spawn_position()
 	spawn_parent.add_child(enemy)
 
@@ -90,17 +103,17 @@ func get_random_spawn_position() -> Vector2:
 	var side = randi() % 4
 
 	match side:
-		0:  # top
+		0: # top
 			spawn_pos.x = randf_range(0, screen_size.x)
-			spawn_pos.y = -spawn_margin
-		1:  # right
+			spawn_pos.y = - spawn_margin
+		1: # right
 			spawn_pos.x = screen_size.x + spawn_margin
 			spawn_pos.y = randf_range(0, screen_size.y)
-		2:  # bottom
+		2: # bottom
 			spawn_pos.x = randf_range(0, screen_size.x)
 			spawn_pos.y = screen_size.y + spawn_margin
-		3:  # left
-			spawn_pos.x = -spawn_margin
+		3: # left
+			spawn_pos.x = - spawn_margin
 			spawn_pos.y = randf_range(0, screen_size.y)
 
 	return spawn_pos

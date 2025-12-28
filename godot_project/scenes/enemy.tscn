@@ -21,3 +21,5 @@ shape = SubResource("CircleShape2D_uhfjk")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_4ra3w")
+
+[node name="DashTimer" type="Timer" parent="."]
