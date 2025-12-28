@@ -15,6 +15,10 @@ signal score_changed(new_score: int)
 @onready var audio_ambient_loop_1: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_loop_2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_door_creak: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_bees: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_birds: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_chains: AudioStreamPlayer = AudioStreamPlayer.new()
+
 
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -42,6 +46,7 @@ func _ready():
 
 func start_game():
 	current_score = 0
+	reset_music_pitch()
 	audio_start_game.play()
 	start_ingame_music()
 	start_ambient_sounds()
@@ -56,6 +61,7 @@ func return_to_menu():
 	audio_start_game.stop() # just in case its still playing
 	stop_ingame_music()
 	stop_ambient_sounds()
+	reset_music_pitch()
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -64,6 +70,7 @@ func return_to_menu():
 
 func restart_game():
 	current_score = 0
+	reset_music_pitch()
 	stop_ingame_music()
 	stop_ambient_sounds()
 	ingame_music_position = 0.0
@@ -104,6 +111,7 @@ func resume_game():
 
 func add_score(points: int):
 	current_score += points
+	change_music_pitch()
 	score_changed.emit(current_score)
 
 
@@ -139,6 +147,18 @@ func load_audio():
 	audio_ambient_door_creak.stream = preload("res://audio/ambient/doorcreak.ogg")
 	audio_ambient_door_creak.bus = "Door Creak"
 	add_child(audio_ambient_door_creak)
+
+	audio_ambient_bees.stream = preload("res://audio/ambient/bees.ogg")
+	audio_ambient_bees.bus = "Bees"
+	add_child(audio_ambient_bees)
+
+	audio_ambient_birds.stream = preload("res://audio/ambient/birds.ogg")
+	audio_ambient_birds.bus = "Birds"
+	add_child(audio_ambient_birds)
+
+	audio_ambient_chains.stream = preload("res://audio/ambient/chains.ogg")
+	audio_ambient_chains.bus = "Chains"
+	add_child(audio_ambient_chains)
 
 	#########################################################################
 	# ingame sound effects
@@ -206,6 +226,14 @@ func resume_ingame_music():
 	audio_ambient_loop_1.play()
 
 
+func change_music_pitch():
+	var pitch_change = current_score / 30000.0
+	pitch_change = clamp(1.0 + pitch_change, 1.0, 16.0)
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("Music"), 0).set_pitch_scale(pitch_change)
+
+func reset_music_pitch():
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("Music"), 0).set_pitch_scale(1.0)
+
 func sound_player_died():
 	audio_player_dead.play()
 
@@ -219,14 +247,43 @@ func sound_enemy_died():
 
 func start_random_ambient_sounds():
 	while audio_ambient_loop_1.playing:
-		var wait_time = 40 + randi() % 40
+		var wait_time = 20 + randi() % 40
 		await get_tree().create_timer(wait_time).timeout
 		if not audio_ambient_loop_1.playing:
 			break
-		audio_ambient_door_creak.play()
+		var r = randi() % 4
+		if r == 0:
+			play_door_creak()
+		elif r == 1:
+			play_bees()
+		elif r == 2:
+			play_birds()
+		elif r == 3:
+			play_chains()
 
 func stop_random_ambient_sounds():
+	stop_door_creak()
+	stop_bees()
+	stop_birds()
+	stop_chains()
+
+
+func play_door_creak():
+	audio_ambient_door_creak.play()
+func stop_door_creak():
 	audio_ambient_door_creak.stop()
+func play_bees():
+	audio_ambient_bees.play()
+func stop_bees():
+	audio_ambient_bees.stop()
+func play_birds():
+	audio_ambient_birds.play()
+func stop_birds():
+	audio_ambient_birds.stop()
+func play_chains():
+	audio_ambient_chains.play()
+func stop_chains():
+	audio_ambient_chains.stop()
 
 
 @onready var eerie_winds_target_volume: float = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"))
