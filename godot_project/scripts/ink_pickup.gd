@@ -18,8 +18,8 @@ const PLAYER_LAYER = 2
 
 func _ready():
 	# setup collision layers
-	collision_layer = 1 << (PICKUP_LAYER - 1)  # Layer 5
-	collision_mask = 1 << (PLAYER_LAYER - 1)  # DeTEct player on Layer 2
+	collision_layer = 1 << (PICKUP_LAYER - 1) # Layer 5
+	collision_mask = 1 << (PLAYER_LAYER - 1) # DeTEct player on Layer 2
 
 	# connect to area entered signal for player detection
 	body_entered.connect(_on_body_entered)
@@ -59,5 +59,5 @@ func _on_body_entered(body: Node2D):
 		var brush = get_tree().get_first_node_in_group("brush")
 		if brush and brush.has_method("add_ink"):
 			brush.add_ink(ink_amount)
-			# TODO: play pickup sound effect
+			GameManager.start_playing_ink_pickup()
 			queue_free()

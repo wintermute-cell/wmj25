@@ -1,10 +1,16 @@
-[gd_resource type="AudioBusLayout" load_steps=5 format=3 uid="uid://wr18634x15h7"]
+[gd_resource type="AudioBusLayout" load_steps=7 format=3 uid="uid://wr18634x15h7"]
 
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_j3pel"]
 resource_name = "PitchShift"
 
+[sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_5t1r3"]
+resource_name = "PitchShift"
+
 [sub_resource type="AudioEffectHighPassFilter" id="AudioEffectHighPassFilter_j3pel"]
 resource_name = "HighPassFilter"
+
+[sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_n8wo2"]
+resource_name = "PitchShift"
 
 [sub_resource type="AudioEffectReverb" id="AudioEffectReverb_j3pel"]
 resource_name = "Reverb"
@@ -79,6 +85,8 @@ bus/10/mute = false
 bus/10/bypass_fx = false
 bus/10/volume_db = -22.576582
 bus/10/send = &"Ambient"
+bus/10/effect/0/effect = SubResource("AudioEffectPitchShift_5t1r3")
+bus/10/effect/0/enabled = true
 bus/11/name = &"Chains"
 bus/11/solo = false
 bus/11/mute = false
@@ -93,3 +101,17 @@ bus/12/volume_db = 0.0
 bus/12/send = &"Soundeffects"
 bus/12/effect/0/effect = SubResource("AudioEffectHighPassFilter_j3pel")
 bus/12/effect/0/enabled = true
+bus/13/name = &"Breath"
+bus/13/solo = false
+bus/13/mute = false
+bus/13/bypass_fx = false
+bus/13/volume_db = -8.395242
+bus/13/send = &"Soundeffects"
+bus/13/effect/0/effect = SubResource("AudioEffectPitchShift_n8wo2")
+bus/13/effect/0/enabled = true
+bus/14/name = &"Inkpickup"
+bus/14/solo = false
+bus/14/mute = false
+bus/14/bypass_fx = false
+bus/14/volume_db = -4.002995
+bus/14/send = &"Soundeffects"

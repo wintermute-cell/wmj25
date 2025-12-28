@@ -16,7 +16,7 @@ signal score_changed(new_score: int)
 @onready var audio_ambient_loop_2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_bees: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_birds: AudioStreamPlayer = AudioStreamPlayer.new()
-# TODO: ambient scream sound oder so
+@onready var audio_ambient_breath: AudioStreamPlayer = AudioStreamPlayer.new()
 
 
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -29,7 +29,7 @@ signal score_changed(new_score: int)
 @onready var audio_enemy_dead3: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead_additional: AudioStreamPlayer = AudioStreamPlayer.new()
 
-@onready var audio_item_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ink_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_score_increase: AudioStreamPlayer = AudioStreamPlayer.new()
 
 
@@ -154,6 +154,10 @@ func load_audio():
 	audio_ambient_birds.bus = "Birds"
 	add_child(audio_ambient_birds)
 
+	audio_ambient_breath.stream = preload("res://audio/ambient/breath.mp3")
+	audio_ambient_breath.bus = "Breath"
+	add_child(audio_ambient_breath)
+
 	#########################################################################
 	# ingame sound effects
 	audio_player_dead.stream = preload("res://audio/dead.mp3")
@@ -170,6 +174,9 @@ func load_audio():
 	audio_enemy_dead_additional.bus = "Woosch"
 	add_child(audio_enemy_dead_additional)
 
+	audio_ink_pickup.stream = preload("res://audio/inkpickup.wav")
+	audio_ink_pickup.bus = "Inkpickup"
+	add_child(audio_ink_pickup)
 
 	audio_score_increase.stream = preload("res://audio/score.mp3")
 	audio_score_increase.bus = "Score"
@@ -255,15 +262,24 @@ func start_random_ambient_sounds():
 		await get_tree().create_timer(wait_time).timeout
 		if not audio_ambient_loop_1.playing:
 			break
-		var r = randi() % 2
+		var r = randi() % 3
 		if r == 0:
 			play_bees()
 		elif r == 1:
+			# set pitch variation
+			var random_pitch_for_birds = 1.0 + (randf() * 0.1) - 0.1
+			AudioServer.get_bus_effect(AudioServer.get_bus_index("Birds"), 0).set_pitch_scale(random_pitch_for_birds)
 			play_birds()
+		elif r == 2:
+			# set pitch variation
+			var random_pitch_for_breath = 1.0 + (randf() * 0.2) - 0.1
+			AudioServer.get_bus_effect(AudioServer.get_bus_index("Breath"), 0).set_pitch_scale(random_pitch_for_breath)
+			play_breath()
 
 func stop_random_ambient_sounds():
 	stop_bees()
 	stop_birds()
+	stop_breath()
 
 
 func play_bees():
@@ -274,6 +290,10 @@ func play_birds():
 	audio_ambient_birds.play()
 func stop_birds():
 	audio_ambient_birds.stop()
+func play_breath():
+	audio_ambient_breath.play()
+func stop_breath():
+	audio_ambient_breath.stop()
 
 
 @onready var eerie_winds_target_volume: float = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"))
@@ -348,3 +368,8 @@ func start_playing_score_increase():
 	audio_score_increase.play()
 func stop_playing_score_increase():
 	audio_score_increase.stop()
+
+func start_playing_ink_pickup():
+	audio_ink_pickup.play()
+func stop_playing_ink_pickup():
+	audio_ink_pickup.stop()
