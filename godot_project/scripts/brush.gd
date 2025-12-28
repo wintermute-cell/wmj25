@@ -11,9 +11,9 @@ class InkPoint:
 	var position: Vector2
 	var size: float
 	var creation_time: float
-	var max_lifetime: float = 2.0  # seconds until fully dried
-	var is_main_stroke: bool = true  # false for splotches/pools
-	var rotation: float = 0.0  # rotation in radians
+	var max_lifetime: float = 2.0 # seconds until fully dried
+	var is_main_stroke: bool = true # false for splotches/pools
+	var rotation: float = 0.0 # rotation in radians
 
 	func _init(
 		pos: Vector2,
@@ -126,8 +126,8 @@ var last_velocity: Vector2 = Vector2.ZERO
 var current_time: float = 0.0
 var stroke_start_time: float = 0.0
 var accumulated_distance: float = 0.0
-var cleanup_timer: float = 0.0  # timer for periodic cleanup
-var smoothed_size: float = 0.0  # smoothed brush size to prevent rapid changes
+var cleanup_timer: float = 0.0 # timer for periodic cleanup
+var smoothed_size: float = 0.0 # smoothed brush size to prevent rapid changes
 
 
 func _ready():
@@ -188,11 +188,13 @@ func _input(event: InputEvent):
 				smoothed_size = brush_min_size
 				# initial touch is small and clean
 				add_ink_splatter(event.position, Vector2.ZERO, true)
+				GameManager.start_playing_brush_stroke()
 			else:
 				# lift brush
 				if is_drawing:
 					add_ink_splatter(event.position, last_velocity, false, true)
 				is_drawing = false
+				GameManager.stop_playing_brush_stroke()
 
 	elif event is InputEventMouseMotion:
 		if is_drawing:
@@ -392,7 +394,7 @@ func _draw():
 				# save current transform, rotate around point position
 				draw_set_transform(point.position, point.rotation, Vector2.ONE)
 				# draw texture centered at origin (since we transformed to point position)
-				var draw_pos = -(tex_size * scale * 0.5)
+				var draw_pos = - (tex_size * scale * 0.5)
 				draw_texture_rect(
 					texture_to_use, Rect2(draw_pos, tex_size * scale), false, color_with_alpha
 				)

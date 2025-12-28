@@ -14,6 +14,8 @@ signal score_changed(new_score: int)
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_dead: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_brush_stroke_double: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_brush_stroke_single: AudioStreamPlayer = AudioStreamPlayer.new()
 
 var ingame_music_position: float = 0.0
 
@@ -85,6 +87,14 @@ func resume_game():
 		get_tree().paused = false
 
 
+func add_score(points: int):
+	current_score += points
+	score_changed.emit(current_score)
+
+
+#########################################################################
+## Audio Management
+#########################################################################
 func load_audio():
 	set_music_volume(0.5)
 	set_soundeffects_volume(0.5)
@@ -93,19 +103,43 @@ func load_audio():
 	audio_start_game.bus = "Soundeffects"
 	add_child(audio_start_game)
 
+	# UI click sound
 	audio_click_menu_item.stream = preload("res://audio/chime.mp3")
 	audio_click_menu_item.bus = "Soundeffects"
 	add_child(audio_click_menu_item)
 
+	# ingame music
 	audio_ingame_music.stream = preload("res://audio/music.mp3")
 	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
 
+	#########################################################################
+	# ingame sound effects
 	audio_dead.stream = preload("res://audio/dead.mp3")
 	audio_dead.bus = "Soundeffects"
 	add_child(audio_dead)
 
+	audio_brush_stroke_double.stream = preload("res://audio/stroke1.mp3")
+	audio_brush_stroke_double.bus = "Brushstrokes"
+	add_child(audio_brush_stroke_double)
 
+	audio_brush_stroke_single.stream = preload("res://audio/strokesingle.mp3")
+	audio_brush_stroke_single.bus = "Brushstrokes"
+	add_child(audio_brush_stroke_single)
+
+
+func set_music_volume(volume: float):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
+
+
+func set_soundeffects_volume(volume: float, replay_click: bool = false):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)
+	if replay_click:
+		audio_click_menu_item.play()
+
+
+##################
+# Playback control
 func start_ingame_music():
 	await audio_start_game.finished
 	audio_ingame_music.play(ingame_music_position)
@@ -119,16 +153,31 @@ func sound_player_died():
 	audio_dead.play()
 
 
-func set_music_volume(volume: float):
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
+######
+# brush sounds
+
+var brush_stroke_playing: bool = false
 
 
-func set_soundeffects_volume(volume: float, replay_click: bool = false):
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)
-	if replay_click:
-		audio_click_menu_item.play()
+func start_playing_brush_stroke():
+	brush_stroke_playing = true
+	while brush_stroke_playing:
+		var r = randi() % 2
+		if r == 0:
+			audio_brush_stroke_single.play()
+			await audio_brush_stroke_single.finished
+		else:
+			audio_brush_stroke_double.play()
+			await audio_brush_stroke_double.finished
 
 
-func add_score(points: int):
-	current_score += points
-	score_changed.emit(current_score)
+func stop_playing_brush_stroke():
+	brush_stroke_playing = false
+
+
+func play_brush_stroke_double():
+	audio_brush_stroke_double.play()
+
+
+func play_brush_stroke_single():
+	audio_brush_stroke_single.play()
