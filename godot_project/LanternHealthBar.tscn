@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://djlv25g846rld"]
+
+[ext_resource type="Script" uid="uid://krrafckn5wur" path="res://scripts/ui/lantern_health_bar.gd" id="1_3e66i"]
+
+[node name="LanternHealthBar" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_3e66i")

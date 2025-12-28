@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=20 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="Script" uid="uid://bn2t2h2bqedir" path="res://scripts/game.gd" id="1_kvuet"]
 [ext_resource type="Script" uid="uid://bepm072l20xet" path="res://scripts/enemy_spawner.gd" id="2_trtic"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://d257nqp3u5byv" path="res://scenes/enemy.tscn" id="10_dinhu"]
 [ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_37s47"]
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="12_bt5mj"]
+[ext_resource type="PackedScene" uid="uid://djlv25g846rld" path="res://LanternHealthBar.tscn" id="13_kvuet"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kvuet"]
 shader = ExtResource("5_kvpfn")
@@ -193,3 +194,11 @@ offset_right = 198.0
 offset_bottom = 80.0
 grow_horizontal = 2
 value = 100.0
+
+[node name="LanternHealthBar" parent="CanvasLayer" instance=ExtResource("13_kvuet")]
+offset_left = 960.0
+offset_top = 55.0
+offset_right = 960.0
+offset_bottom = 55.0
+scale = Vector2(3, 3)
+arc_height = 30.0

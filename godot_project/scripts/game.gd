@@ -1,7 +1,7 @@
 extends Node2D
 
 @onready var score_label: Label = $CanvasLayer/ScoreLabel
-@onready var health_bar: ProgressBar = $CanvasLayer/HealthBar
+@onready var health_bar = $CanvasLayer/LanternHealthBar
 @onready var player: CharacterBody2D = $CanvasLayer/SubViewportContainer/SubViewport/Player
 @onready var enemy_spawner: Node2D = $EnemySpawner
 @onready var background: Sprite2D = $CanvasLayer/SubViewportContainer/SubViewport/Background
@@ -55,5 +55,5 @@ func _on_score_changed(new_score: int):
 
 
 func _on_health_changed(current_health: float, max_health: float):
-	health_bar.max_value = max_health
-	health_bar.value = current_health
+	if health_bar and health_bar.has_method("update_health"):
+		health_bar.update_health(current_health, max_health)

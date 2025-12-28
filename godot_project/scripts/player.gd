@@ -12,7 +12,11 @@ extends CharacterBody2D
 ## Maximum health
 @export var max_health: float = 100.0
 
+## Time between camera shakes when taking damage
+@export var damage_shake_cooldown: float = 0.3
+
 var health: float = 100.0
+var last_damage_shake_time: float = -999.0  # Track last shake time
 
 signal health_changed(current_health: float, max_health: float)
 
@@ -22,8 +26,8 @@ const PLAYER_LAYER = 2
 
 
 func _ready():
-	collision_layer = 1 << (PLAYER_LAYER - 1) # L2
-	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
+	collision_layer = 1 << (PLAYER_LAYER - 1)  # L2
+	collision_mask = 1 << (WALL_LAYER - 1)  # coll with walls (L1)
 
 	health = max_health
 	health_changed.emit(health, max_health)
@@ -49,14 +53,23 @@ func _physics_process(delta: float):
 	# check if player would is out of bounds, and clamp position
 	var viewport_rect = get_viewport_rect()
 	var player_size_half = get_node("Sprite2D").texture.get_size() / 2
-	position.x = clamp(position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x)
-	position.y = clamp(position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y)
+	position.x = clamp(
+		position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x
+	)
+	position.y = clamp(
+		position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y
+	)
 
 
 func take_damage(amount: float):
 	health -= amount
 	health = max(health, 0.0)  # clamp to 0
 	health_changed.emit(health, max_health)
+
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - last_damage_shake_time >= damage_shake_cooldown:
+		CameraShake.add_trauma(0.3)
+		last_damage_shake_time = current_time
 
 	if health <= 0:
 		GameManager.sound_player_died()
