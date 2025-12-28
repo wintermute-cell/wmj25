@@ -4,7 +4,7 @@ extends Node
 const MAIN_MENU_PATH = "res://scenes/main_menu.tscn"
 const GAME_PATH = "res://scenes/game.tscn"
 
-enum GameState { MENU, PLAYING, PAUSED, LOADING }
+enum GameState {MENU, PLAYING, PAUSED, LOADING}
 var current_state: GameState = GameState.MENU
 
 var current_score: int = 0
@@ -13,9 +13,15 @@ signal score_changed(new_score: int)
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
-@onready var audio_dead: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_brush_stroke_double: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_brush_stroke_single: AudioStreamPlayer = AudioStreamPlayer.new()
+
+@onready var audio_player_dead: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_enemy_dead2: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_enemy_dead3: AudioStreamPlayer = AudioStreamPlayer.new()
+
+@onready var audio_item_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
+
 
 var ingame_music_position: float = 0.0
 
@@ -41,7 +47,7 @@ func start_game():
 
 
 func return_to_menu():
-	audio_start_game.stop()  # just in case its still playing
+	audio_start_game.stop() # just in case its still playing
 	ingame_music_position = 0.0
 	audio_ingame_music.stop()
 	if current_state == GameState.LOADING:
@@ -115,9 +121,17 @@ func load_audio():
 
 	#########################################################################
 	# ingame sound effects
-	audio_dead.stream = preload("res://audio/dead.mp3")
-	audio_dead.bus = "Soundeffects"
-	add_child(audio_dead)
+	audio_player_dead.stream = preload("res://audio/dead.mp3")
+	audio_player_dead.bus = "Soundeffects"
+	add_child(audio_player_dead)
+
+	audio_enemy_dead2.stream = preload("res://audio/breaking2.mp3")
+	audio_enemy_dead2.bus = "Soundeffects"
+	add_child(audio_enemy_dead2)
+	audio_enemy_dead3.stream = preload("res://audio/breaking3.mp3")
+	audio_enemy_dead3.bus = "Soundeffects"
+	add_child(audio_enemy_dead3)
+
 
 	audio_brush_stroke_double.stream = preload("res://audio/stroke1.mp3")
 	audio_brush_stroke_double.bus = "Brushstrokes"
@@ -150,12 +164,18 @@ func resume_ingame_music():
 
 
 func sound_player_died():
-	audio_dead.play()
+	audio_player_dead.play()
+
+func sound_enemy_died():
+	var r = randi() % 2
+	if r == 0:
+		audio_enemy_dead2.play()
+	else:
+		audio_enemy_dead3.play()
 
 
 ######
 # brush sounds
-
 var brush_stroke_playing: bool = false
 
 
