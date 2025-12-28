@@ -28,6 +28,7 @@ signal score_changed(new_score: int)
 @onready var audio_player_dead: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead3: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_enemy_dead_additional: AudioStreamPlayer = AudioStreamPlayer.new()
 
 @onready var audio_item_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
 
@@ -167,11 +168,14 @@ func load_audio():
 	add_child(audio_player_dead)
 
 	audio_enemy_dead2.stream = preload("res://audio/breaking2.mp3")
-	audio_enemy_dead2.bus = "Soundeffects"
+	audio_enemy_dead2.bus = "Breaking"
 	add_child(audio_enemy_dead2)
 	audio_enemy_dead3.stream = preload("res://audio/breaking3.mp3")
-	audio_enemy_dead3.bus = "Soundeffects"
+	audio_enemy_dead3.bus = "Breaking"
 	add_child(audio_enemy_dead3)
+	audio_enemy_dead_additional.stream = preload("res://audio/woosch.wav")
+	audio_enemy_dead_additional.bus = "Woosch"
+	add_child(audio_enemy_dead_additional)
 
 
 	audio_brush_stroke_double.stream = preload("res://audio/stroke1.mp3")
@@ -243,7 +247,7 @@ func sound_enemy_died():
 		audio_enemy_dead2.play()
 	else:
 		audio_enemy_dead3.play()
-
+	audio_enemy_dead_additional.play()
 
 func start_random_ambient_sounds():
 	while audio_ambient_loop_1.playing:
