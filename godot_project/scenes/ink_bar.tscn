@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b70dgj1peoqt5"]
 
-[ext_resource type="Script" uid="uid://bhgjvm4wpj7nu" path="res://scripts/ui/ink_bar.gd" id="1_3o41p"]
+[ext_resource type="Script" path="res://scripts/ui/ink_bar.gd" id="1_3o41p"]
 
 [node name="InkBar" type="Control"]
 layout_mode = 3

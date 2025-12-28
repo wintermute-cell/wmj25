@@ -16,7 +16,7 @@ signal score_changed(new_score: int)
 @onready var audio_ambient_loop_2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_bees: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_birds: AudioStreamPlayer = AudioStreamPlayer.new()
-@onready var audio_ambient_chains: AudioStreamPlayer = AudioStreamPlayer.new()
+# TODO: ambient scream sound oder so
 
 
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -30,6 +30,7 @@ signal score_changed(new_score: int)
 @onready var audio_enemy_dead_additional: AudioStreamPlayer = AudioStreamPlayer.new()
 
 @onready var audio_item_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_score_increase: AudioStreamPlayer = AudioStreamPlayer.new()
 
 
 var ingame_music_position: float = 0.0
@@ -113,6 +114,7 @@ func add_score(points: int):
 	current_score += points
 	change_music_pitch()
 	score_changed.emit(current_score)
+	start_playing_score_increase()
 
 
 #########################################################################
@@ -152,10 +154,6 @@ func load_audio():
 	audio_ambient_birds.bus = "Birds"
 	add_child(audio_ambient_birds)
 
-	audio_ambient_chains.stream = preload("res://audio/ambient/chains.ogg")
-	audio_ambient_chains.bus = "Chains"
-	add_child(audio_ambient_chains)
-
 	#########################################################################
 	# ingame sound effects
 	audio_player_dead.stream = preload("res://audio/dead.mp3")
@@ -171,6 +169,11 @@ func load_audio():
 	audio_enemy_dead_additional.stream = preload("res://audio/woosch.wav")
 	audio_enemy_dead_additional.bus = "Woosch"
 	add_child(audio_enemy_dead_additional)
+
+
+	audio_score_increase.stream = preload("res://audio/score.mp3")
+	audio_score_increase.bus = "Score"
+	add_child(audio_score_increase)
 
 
 	audio_brush_stroke_double.stream = preload("res://audio/stroke1.mp3")
@@ -252,18 +255,15 @@ func start_random_ambient_sounds():
 		await get_tree().create_timer(wait_time).timeout
 		if not audio_ambient_loop_1.playing:
 			break
-		var r = randi() % 3
+		var r = randi() % 2
 		if r == 0:
 			play_bees()
 		elif r == 1:
 			play_birds()
-		elif r == 2:
-			play_chains()
 
 func stop_random_ambient_sounds():
 	stop_bees()
 	stop_birds()
-	stop_chains()
 
 
 func play_bees():
@@ -274,10 +274,6 @@ func play_birds():
 	audio_ambient_birds.play()
 func stop_birds():
 	audio_ambient_birds.stop()
-func play_chains():
-	audio_ambient_chains.play()
-func stop_chains():
-	audio_ambient_chains.stop()
 
 
 @onready var eerie_winds_target_volume: float = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"))
@@ -340,10 +336,15 @@ func start_playing_brush_stroke():
 func stop_playing_brush_stroke():
 	brush_stroke_playing = false
 
-
 func play_brush_stroke_double():
 	audio_brush_stroke_double.play()
 
-
 func play_brush_stroke_single():
 	audio_brush_stroke_single.play()
+
+
+func start_playing_score_increase():
+	await get_tree().create_timer(0.2).timeout
+	audio_score_increase.play()
+func stop_playing_score_increase():
+	audio_score_increase.stop()

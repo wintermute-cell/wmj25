@@ -1,7 +1,10 @@
-[gd_resource type="AudioBusLayout" load_steps=4 format=3 uid="uid://wr18634x15h7"]
+[gd_resource type="AudioBusLayout" load_steps=5 format=3 uid="uid://wr18634x15h7"]
 
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_j3pel"]
 resource_name = "PitchShift"
+
+[sub_resource type="AudioEffectHighPassFilter" id="AudioEffectHighPassFilter_j3pel"]
+resource_name = "HighPassFilter"
 
 [sub_resource type="AudioEffectReverb" id="AudioEffectReverb_j3pel"]
 resource_name = "Reverb"
@@ -82,3 +85,11 @@ bus/11/mute = false
 bus/11/bypass_fx = false
 bus/11/volume_db = -15.794972
 bus/11/send = &"Ambient"
+bus/12/name = &"Score"
+bus/12/solo = false
+bus/12/mute = false
+bus/12/bypass_fx = false
+bus/12/volume_db = 0.0
+bus/12/send = &"Soundeffects"
+bus/12/effect/0/effect = SubResource("AudioEffectHighPassFilter_j3pel")
+bus/12/effect/0/enabled = true
