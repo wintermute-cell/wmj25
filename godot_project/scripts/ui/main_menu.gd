@@ -10,7 +10,7 @@ func _ready():
 	audio_quit.stream = preload("res://audio/quit.mp3")
 	audio_quit.bus = "Soundeffects"
 	audio_menumusic.stream = preload("res://audio/menumusic.mp3")
-	audio_menumusic.bus = "Music"
+	audio_menumusic.bus = "MusicSlider"
 	add_child(audio_menumusic)
 	add_child(audio_quit)
 	audio_menumusic.play()

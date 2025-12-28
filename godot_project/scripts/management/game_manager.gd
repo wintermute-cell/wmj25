@@ -125,12 +125,12 @@ func load_audio():
 	set_soundeffects_volume(0.5)
 
 	audio_start_game.stream = preload("res://audio/newgame.mp3")
-	audio_start_game.bus = "Soundeffects"
+	audio_start_game.bus = "SoundeffectsSlider"
 	add_child(audio_start_game)
 
 	# UI click sound
 	audio_click_menu_item.stream = preload("res://audio/chime.mp3")
-	audio_click_menu_item.bus = "Soundeffects"
+	audio_click_menu_item.bus = "SoundeffectsSlider"
 	add_child(audio_click_menu_item)
 
 	# ingame music and ambient loops
@@ -139,7 +139,7 @@ func load_audio():
 	add_child(audio_ingame_music)
 
 	audio_ambient_loop_1.stream = preload("res://audio/ambient/ambient1.wav")
-	audio_ambient_loop_1.bus = "Ambient"
+	audio_ambient_loop_1.bus = "AmbientSlider"
 	add_child(audio_ambient_loop_1)
 
 	audio_ambient_loop_2.stream = preload("res://audio/ambient/eerie_winds.wav")
@@ -161,7 +161,7 @@ func load_audio():
 	#########################################################################
 	# ingame sound effects
 	audio_player_dead.stream = preload("res://audio/dead.mp3")
-	audio_player_dead.bus = "Soundeffects"
+	audio_player_dead.bus = "SoundeffectsSlider"
 	add_child(audio_player_dead)
 
 	audio_enemy_dead2.stream = preload("res://audio/breaking2.mp3")
@@ -193,16 +193,16 @@ func load_audio():
 
 
 func set_music_volume(volume: float):
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("MusicSlider"), volume)
 
 
 func set_soundeffects_volume(volume: float, replay_click: bool = false):
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("SoundeffectsSlider"), volume)
 	if replay_click:
 		audio_click_menu_item.play()
 
 func set_ambient_volume(volume: float):
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), volume)
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("AmbientSlider"), volume)
 
 
 ##################
@@ -238,10 +238,10 @@ func resume_ingame_music():
 func change_music_pitch():
 	var pitch_change = current_score / 90000.0
 	pitch_change = clamp(1.0 + pitch_change, 1.0, 16.0)
-	AudioServer.get_bus_effect(AudioServer.get_bus_index("Music"), 0).set_pitch_scale(pitch_change)
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("MusicSlider"), 0).set_pitch_scale(pitch_change)
 
 func reset_music_pitch():
-	AudioServer.get_bus_effect(AudioServer.get_bus_index("Music"), 0).set_pitch_scale(1.0)
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("MusicSlider"), 0).set_pitch_scale(1.0)
 
 func sound_player_died():
 	audio_player_dead.play()
@@ -327,12 +327,12 @@ func fade_out_eerie_winds(step_duration: float = 0.2):
 		await get_tree().create_timer(step_duration).timeout
 
 func fade_in_ambient():
-	var target_volume = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Ambient"))
-	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), 0.0)
+	var target_volume = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("AmbientSlider"))
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("AmbientSlider"), 0.0)
 	var steps = 20
 	for i in range(steps):
 		var vol = target_volume * (i + 1) / steps
-		AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), vol)
+		AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("AmbientSlider"), vol)
 		await get_tree().create_timer(0.2).timeout
 
 
