@@ -10,9 +10,14 @@ var current_state: GameState = GameState.MENU
 var current_score: int = 0
 signal score_changed(new_score: int)
 
+
+@onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_loop_1: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_loop_2: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_ambient_door_creak: AudioStreamPlayer = AudioStreamPlayer.new()
+
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
-@onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_brush_stroke_double: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_brush_stroke_single: AudioStreamPlayer = AudioStreamPlayer.new()
 
@@ -39,6 +44,7 @@ func start_game():
 	current_score = 0
 	audio_start_game.play()
 	start_ingame_music()
+	start_ambient_sounds()
 
 	if current_state == GameState.LOADING:
 		return
@@ -48,8 +54,8 @@ func start_game():
 
 func return_to_menu():
 	audio_start_game.stop() # just in case its still playing
-	ingame_music_position = 0.0
-	audio_ingame_music.stop()
+	stop_ingame_music()
+	stop_ambient_sounds()
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -58,10 +64,13 @@ func return_to_menu():
 
 func restart_game():
 	current_score = 0
-	audio_ingame_music.stop()
+	stop_ingame_music()
+	stop_ambient_sounds()
 	ingame_music_position = 0.0
 	audio_start_game.play()
 	start_ingame_music()
+	start_ambient_sounds()
+
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -77,8 +86,8 @@ func on_scene_loaded(scene_path: String):
 
 
 func pause_game():
-	ingame_music_position = audio_ingame_music.get_playback_position()
-	audio_ingame_music.stop()
+	pause_ingame_music()
+	stop_ambient_sounds()
 	audio_click_menu_item.play()
 	if current_state == GameState.PLAYING:
 		current_state = GameState.PAUSED
@@ -114,10 +123,22 @@ func load_audio():
 	audio_click_menu_item.bus = "Soundeffects"
 	add_child(audio_click_menu_item)
 
-	# ingame music
+	# ingame music and ambient loops
 	audio_ingame_music.stream = preload("res://audio/music.mp3")
 	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
+
+	audio_ambient_loop_1.stream = preload("res://audio/ambient/ambient1.wav")
+	audio_ambient_loop_1.bus = "Ambient"
+	add_child(audio_ambient_loop_1)
+
+	audio_ambient_loop_2.stream = preload("res://audio/ambient/eerie_winds.wav")
+	audio_ambient_loop_2.bus = "Eerie Winds"
+	add_child(audio_ambient_loop_2)
+
+	audio_ambient_door_creak.stream = preload("res://audio/ambient/doorcreak.ogg")
+	audio_ambient_door_creak.bus = "Door Creak"
+	add_child(audio_ambient_door_creak)
 
 	#########################################################################
 	# ingame sound effects
@@ -151,6 +172,9 @@ func set_soundeffects_volume(volume: float, replay_click: bool = false):
 	if replay_click:
 		audio_click_menu_item.play()
 
+func set_ambient_volume(volume: float):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), volume)
+
 
 ##################
 # Playback control
@@ -158,9 +182,28 @@ func start_ingame_music():
 	await audio_start_game.finished
 	audio_ingame_music.play(ingame_music_position)
 
+func pause_ingame_music():
+	ingame_music_position = audio_ingame_music.get_playback_position()
+	audio_ingame_music.stop()
+
+func stop_ingame_music():
+	ingame_music_position = 0.0
+	audio_ingame_music.stop()
+
+func start_ambient_sounds():
+	fade_in_ambient()
+	audio_ambient_loop_1.play()
+	do_eerie_winds()
+	start_random_ambient_sounds()
+
+func stop_ambient_sounds():
+	audio_ambient_loop_1.stop()
+	audio_ambient_loop_2.stop()
+	stop_random_ambient_sounds()
 
 func resume_ingame_music():
 	audio_ingame_music.play(ingame_music_position)
+	audio_ambient_loop_1.play()
 
 
 func sound_player_died():
@@ -172,6 +215,58 @@ func sound_enemy_died():
 		audio_enemy_dead2.play()
 	else:
 		audio_enemy_dead3.play()
+
+
+func start_random_ambient_sounds():
+	while audio_ambient_loop_1.playing:
+		var wait_time = 40 + randi() % 40
+		await get_tree().create_timer(wait_time).timeout
+		if not audio_ambient_loop_1.playing:
+			break
+		audio_ambient_door_creak.play()
+
+func stop_random_ambient_sounds():
+	audio_ambient_door_creak.stop()
+
+
+@onready var eerie_winds_target_volume: float = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"))
+
+func do_eerie_winds():
+	while audio_ambient_loop_1.playing:
+		var wait_time = 5 + randi() % 20
+		var duration = 2 + randi() % 10
+		await get_tree().create_timer(wait_time).timeout
+		if not audio_ambient_loop_1.playing:
+			break
+		audio_ambient_loop_2.play()
+		await fade_in_eerie_winds()
+		await get_tree().create_timer(duration).timeout
+		await fade_out_eerie_winds()
+		audio_ambient_loop_2.stop()
+
+func fade_in_eerie_winds(step_duration: float = 0.2):
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"), 0.0)
+	var steps = 20
+	for i in range(steps):
+		var vol = eerie_winds_target_volume * (i + 1) / steps
+		AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"), vol)
+		await get_tree().create_timer(step_duration).timeout
+
+func fade_out_eerie_winds(step_duration: float = 0.2):
+	var steps = 20
+	for i in range(steps):
+		var vol = eerie_winds_target_volume * (i + 1) / steps
+		AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Eerie Winds"), eerie_winds_target_volume - vol)
+		await get_tree().create_timer(step_duration).timeout
+
+func fade_in_ambient():
+	var target_volume = AudioServer.get_bus_volume_linear(AudioServer.get_bus_index("Ambient"))
+	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), 0.0)
+	var steps = 20
+	for i in range(steps):
+		var vol = target_volume * (i + 1) / steps
+		AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Ambient"), vol)
+		await get_tree().create_timer(0.2).timeout
 
 
 ######

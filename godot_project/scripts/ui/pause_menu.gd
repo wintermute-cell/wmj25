@@ -5,8 +5,9 @@ extends CanvasLayer
 @onready var resume_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResumeButton
 @onready var restart_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RestartButton
 @onready var menu_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MenuButton
-@onready var music_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCMusic/MusicSettings/MusicVolumeSlider
-@onready var soundeffects_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCSoundeffects/SoundEffectSettings/SoundeffectsVolumeSlider
+@onready var music_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/MusicVolumeSlider
+@onready var soundeffects_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/SoundeffectsVolumeSlider
+@onready var ambient_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/AmbientVolumeSlider
 
 func _ready():
 	# connect signals for volume sliders
@@ -15,6 +16,9 @@ func _ready():
 	)
 	soundeffects_volume_slider.value_changed.connect(func(value):
 		GameManager.set_soundeffects_volume(value, true)
+	)
+	ambient_volume_slider.value_changed.connect(func(value):
+		GameManager.set_ambient_volume(value)
 	)
 
 
