@@ -54,6 +54,7 @@ stretch = true
 stretch_shrink = 3
 
 [node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
+handle_input_locally = false
 snap_2d_transforms_to_pixel = true
 canvas_item_default_texture_filter = 0
 size = Vector2i(640, 360)
@@ -159,6 +160,7 @@ shape = SubResource("CircleShape2D_6iyv3")
 texture = ExtResource("8_264po")
 
 [node name="Enemy" parent="CanvasLayer/SubViewportContainer/SubViewport" instance=ExtResource("10_dinhu")]
+position = Vector2(447.00003, 306.6667)
 
 [node name="PaintCollisionManager" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport" node_paths=PackedStringArray("brush", "wall_root")]
 script = ExtResource("11_37s47")

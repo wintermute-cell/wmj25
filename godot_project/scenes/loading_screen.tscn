@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dadiby04sgeut"]
+[gd_scene load_steps=5 format=3 uid="uid://dadiby04sgeut"]
 
 [ext_resource type="FontFile" uid="uid://chmwnlscs8x44" path="res://adventurers_scribbles.ttf" id="1_ep5rh"]
 [ext_resource type="Script" uid="uid://cyjmr4jhmggw7" path="res://scripts/ui/loading_screen.gd" id="1_hprjd"]
+[ext_resource type="Texture2D" uid="uid://c6tl44qq3wat5" path="res://sprites/loading_text.png" id="3_ku3bi"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_hprjd"]
 font = ExtResource("1_ep5rh")
@@ -39,6 +40,12 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 text = "Loading uwu"
 label_settings = SubResource("LabelSettings_hprjd")
+
+[node name="Sprite2D" type="Sprite2D" parent="Control/CenterContainer"]
+position = Vector2(960, 540)
+scale = Vector2(4, 4)
+texture = ExtResource("3_ku3bi")
