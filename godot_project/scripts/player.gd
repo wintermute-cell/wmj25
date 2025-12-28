@@ -46,6 +46,12 @@ func _physics_process(delta: float):
 
 	move_and_slide()
 
+	# check if player would is out of bounds, and clamp position
+	var viewport_rect = get_viewport_rect()
+	var player_size_half = get_node("Sprite2D").texture.get_size() / 2
+	position.x = clamp(position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x)
+	position.y = clamp(position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y)
+
 
 func take_damage(amount: float):
 	health -= amount
