@@ -9,6 +9,9 @@ const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
 ## damage dealt per second when overlapping
 @export var damage_per_second: float = 18.0
 
+## crush margin as a percentage of collision radius (0.3 = 30% extra range)
+@export_range(0.0, 2.0, 0.1) var crush_margin_multiplier: float = 0.3
+
 ## ref to player node (autofound if not set)
 @export var player: CharacterBody2D
 
@@ -74,29 +77,62 @@ func _on_body_exited(body: Node2D):
 
 ## called by PaintCollisionManager when new collision geometry is created
 func _on_new_collision_created(new_polygons: Array[PackedVector2Array]):
-	# check if this enemy is inside any of the new collision polygons
+	# check if this enemy overlaps with any of the new collision polygons
 	for polygon in new_polygons:
-		if is_point_in_polygon(global_position, polygon):
+		if does_enemy_overlap_polygon(polygon):
 			crunch()
 			return
 
 
-func is_point_in_polygon(point: Vector2, polygon: PackedVector2Array) -> bool:
-	return Geometry2D.is_point_in_polygon(point, polygon)
+func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
+	# get enemy's collision shape radius
+	var collision_shape = get_node_or_null("CollisionShape2D")
+	if not collision_shape or not collision_shape.shape:
+		# fallback to point check if no collision shape
+		return Geometry2D.is_point_in_polygon(global_position, polygon)
+
+	var radius = 0.0
+	if collision_shape.shape is CircleShape2D:
+		radius = collision_shape.shape.radius
+	elif collision_shape.shape is CapsuleShape2D:
+		radius = collision_shape.shape.radius
+	else:
+		# unsupported shape, use point check
+		return Geometry2D.is_point_in_polygon(global_position, polygon)
+
+	# add margin to make crushing more forgiving
+	var crush_margin = radius * crush_margin_multiplier
+
+	# check if center is inside polygon
+	if Geometry2D.is_point_in_polygon(global_position, polygon):
+		return true
+
+	# check if enemy circle overlaps with polygon
+	# method: check if any polygon edge is within (radius + margin) of enemy center
+	for i in range(polygon.size()):
+		var p1 = polygon[i]
+		var p2 = polygon[(i + 1) % polygon.size()]
+
+		# find closest point on edge to enemy center
+		var closest = Geometry2D.get_closest_point_to_segment(global_position, p1, p2)
+		var distance = global_position.distance_to(closest)
+
+		# if edge is close enough, enemy overlaps
+		if distance <= (radius + crush_margin):
+			return true
+
+	return false
 
 
 func crunch():
-	# spawn crush particle effect
-	var particles = CRUSH_PARTICLES.instantiate()
-	particles.global_position = global_position
-	get_parent().add_child(particles)
+	var points = 100  # TODO: calc based on enemy type
 
-	# start the particle emission
-	var particle_node = particles.get_node("CPUParticles2D")
-	if particle_node:
-		particle_node.emitting = true
-		# auto-cleanup after particles finish
-		particle_node.finished.connect(particles.queue_free)
+	# spawn crush effect
+	var effect = CRUSH_PARTICLES.instantiate()
+	effect.global_position = global_position
+	effect.score_value = points
+	get_parent().add_child(effect)
 
-	# TODO: score increment
+	GameManager.add_score(points)
+
 	queue_free()

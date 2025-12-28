@@ -1,0 +1,15 @@
+[gd_scene load_steps=6 format=3 uid="uid://cjjce806lcqtl"]
+
+[ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scripts/brush.gd" id="1_2fyin"]
+[ext_resource type="Texture2D" uid="uid://bbj1d3ffmt23a" path="res://brush_config/splotch.png" id="2_es1qv"]
+[ext_resource type="Curve" uid="uid://bmr62cjawl152" path="res://brush_config/brush_speed_to_size_curve.tres" id="3_0xkkf"]
+[ext_resource type="Curve" uid="uid://buhtwsalv8a3i" path="res://brush_config/brush_speed_to_sploch_curve.tres" id="4_tkiw0"]
+[ext_resource type="Curve" uid="uid://db8xt4fm7yjw0" path="res://brush_config/brush_speed_to_pool_curve.tres" id="5_l2wio"]
+
+[node name="Brush" type="Node2D"]
+script = ExtResource("1_2fyin")
+brush_texture = ExtResource("2_es1qv")
+splotch_texture = ExtResource("2_es1qv")
+speed_to_size_curve = ExtResource("3_0xkkf")
+speed_to_splotch_curve = ExtResource("4_tkiw0")
+speed_to_pool_curve = ExtResource("5_l2wio")

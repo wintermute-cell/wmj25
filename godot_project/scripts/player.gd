@@ -14,6 +14,8 @@ extends CharacterBody2D
 
 var health: float = 100.0
 
+signal health_changed(current_health: float, max_health: float)
+
 # coll layers
 const WALL_LAYER = 1
 const PLAYER_LAYER = 2
@@ -24,6 +26,7 @@ func _ready():
 	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
 
 	health = max_health
+	health_changed.emit(health, max_health)
 
 	# player group for enemy targeting
 	add_to_group("player")
@@ -46,6 +49,9 @@ func _physics_process(delta: float):
 
 func take_damage(amount: float):
 	health -= amount
+	health = max(health, 0.0)  # clamp to 0
+	health_changed.emit(health, max_health)
+
 	if health <= 0:
 		GameManager.sound_player_died()
 		die()

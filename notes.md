@@ -1,5 +1,6 @@
 - music
 - sfx
+- loadscreen nice machen
 - game implementation
     <!-- - paint stroke drawing -->
     - world clipping

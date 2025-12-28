@@ -7,6 +7,9 @@ const GAME_PATH = "res://scenes/game.tscn"
 enum GameState { MENU, PLAYING, PAUSED, LOADING }
 var current_state: GameState = GameState.MENU
 
+var current_score: int = 0
+signal score_changed(new_score: int)
+
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_click_menu_item: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -25,6 +28,7 @@ func _ready():
 
 
 func start_game():
+	current_score = 0
 	audio_start_game.play()
 	start_ingame_music()
 
@@ -45,6 +49,7 @@ func return_to_menu():
 
 
 func restart_game():
+	current_score = 0
 	audio_ingame_music.stop()
 	ingame_music_position = 0.0
 	audio_start_game.play()
@@ -122,3 +127,8 @@ func set_soundeffects_volume(volume: float, replay_click: bool = false):
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)
 	if replay_click:
 		audio_click_menu_item.play()
+
+
+func add_score(points: int):
+	current_score += points
+	score_changed.emit(current_score)

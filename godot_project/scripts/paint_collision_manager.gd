@@ -25,7 +25,10 @@ var collision_bodies: Array[StaticBody2D] = []
 var active_body_count: int = 0
 
 # track active coll polygons for crunch detection
-var active_collision_areas: Array[Dictionary] = []  # {polygon: PackedVector2Array, body_index: int}
+var active_collision_areas: Array[Dictionary] = []  # {polygon: PackedVector2Array, body_index: int, hash: int}
+
+# track last ink point count to detect new paint
+var last_ink_point_count: int = 0
 
 # wall polys extracted from scene
 var walls: Array[PackedVector2Array] = []
@@ -119,6 +122,10 @@ func update_collision_geometry():
 	var ink_points = brush.ink_points
 	var current_time = brush.current_time
 
+	# check if new paint was added since last update
+	var has_new_paint = ink_points.size() > last_ink_point_count
+	last_ink_point_count = ink_points.size()
+
 	# check if we have walls
 	if walls.is_empty():
 		clear_all_collisions()
@@ -172,7 +179,11 @@ func update_collision_geometry():
 				if intersection_poly.size() >= 3:  # Valid polygon
 					create_collision_for_polygon(intersection_poly, active_body_count)
 					new_collision_areas.append(
-						{"polygon": intersection_poly, "body_index": active_body_count}
+						{
+							"polygon": intersection_poly,
+							"body_index": active_body_count,
+							"hash": hash_polygon(intersection_poly)
+						}
 					)
 					active_body_count += 1
 
@@ -202,8 +213,9 @@ func update_collision_geometry():
 	# 		)
 	# 	)
 
-	# check for crunches
-	check_crunches(new_collision_areas)
+	# check for crunches only if new paint was added
+	if has_new_paint:
+		check_crunches(new_collision_areas)
 
 	# update active collision tracking
 	active_collision_areas = new_collision_areas
@@ -317,32 +329,34 @@ func check_crunches(new_areas: Array[Dictionary]):
 	# compare new collision areas with previous ones
 	# if a new area appears, check if any enemies are inside it
 
+	# build set of old hashes for quick lookup
+	var old_hashes = {}
+	for old_area in active_collision_areas:
+		old_hashes[old_area.hash] = true
+
 	# find truly new areas not present in prev frame
 	var newly_created_areas: Array[PackedVector2Array] = []
 
 	for new_area in new_areas:
-		var is_new = true
-
-		# check if this area existed before (rough check by comparing first point lol)
-		for old_area in active_collision_areas:
-			if polygons_similar(new_area.polygon, old_area.polygon):
-				is_new = false
-				break
-
-		if is_new:
+		# check if this hash existed in previous frame
+		if not old_hashes.has(new_area.hash):
 			newly_created_areas.append(new_area.polygon)
 
-	# notify enemies of new collision areas (enemy checks check if its inside)
+	# notify enemies of new collision areas (enemy checks if they're inside)
 	if not newly_created_areas.is_empty():
 		get_tree().call_group("enemies", "_on_new_collision_created", newly_created_areas)
 
 
-func polygons_similar(poly1: PackedVector2Array, poly2: PackedVector2Array) -> bool:
-	# TODO: this might need some improvement, dunno
-	if poly1.is_empty() or poly2.is_empty():
-		return false
-
-	return poly1[0].distance_to(poly2[0]) < 1.0
+func hash_polygon(polygon: PackedVector2Array) -> int:
+	# create a hash from polygon vertices (rounded to avoid floating point issues)
+	var hash_value = 0
+	for point in polygon:
+		var x = int(round(point.x))
+		var y = int(round(point.y))
+		# simple hash combination
+		hash_value = hash_value ^ (x * 73856093)
+		hash_value = hash_value ^ (y * 19349663)
+	return hash_value
 
 
 func _exit_tree():
