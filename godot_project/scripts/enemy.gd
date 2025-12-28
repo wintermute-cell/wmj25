@@ -123,6 +123,7 @@ func dash_towards_player():
 	if player != null and is_instance_valid(player):
 		is_dashing = true
 		speed = dash_speed
+		GameManager.start_playing_enemy_dash()
 		await get_tree().create_timer(dash_duration).timeout
 		speed = dasher_base_speed
 		dash_timer.wait_time = dash_cooldown

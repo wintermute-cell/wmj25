@@ -28,6 +28,7 @@ signal score_changed(new_score: int)
 @onready var audio_enemy_dead2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead3: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead_additional: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_enemy_dash: AudioStreamPlayer = AudioStreamPlayer.new()
 
 @onready var audio_ink_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_score_increase: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -157,6 +158,10 @@ func load_audio():
 	audio_ambient_breath.stream = preload("res://audio/ambient/breath.mp3")
 	audio_ambient_breath.bus = "Breath"
 	add_child(audio_ambient_breath)
+
+	audio_enemy_dash.stream = preload("res://audio/dash.mp3")
+	audio_enemy_dash.bus = "SoundeffectsSlider"
+	add_child(audio_enemy_dash)
 
 	#########################################################################
 	# ingame sound effects
@@ -373,3 +378,8 @@ func start_playing_ink_pickup():
 	audio_ink_pickup.play()
 func stop_playing_ink_pickup():
 	audio_ink_pickup.stop()
+
+func start_playing_enemy_dash():
+	audio_enemy_dash.play()
+func stop_playing_enemy_dash():
+	audio_enemy_dash.stop()
