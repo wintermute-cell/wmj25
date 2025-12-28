@@ -14,7 +14,6 @@ signal score_changed(new_score: int)
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_loop_1: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_loop_2: AudioStreamPlayer = AudioStreamPlayer.new()
-@onready var audio_ambient_door_creak: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_bees: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_birds: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_chains: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -145,10 +144,6 @@ func load_audio():
 	audio_ambient_loop_2.bus = "Eerie Winds"
 	add_child(audio_ambient_loop_2)
 
-	audio_ambient_door_creak.stream = preload("res://audio/ambient/doorcreak.ogg")
-	audio_ambient_door_creak.bus = "Door Creak"
-	add_child(audio_ambient_door_creak)
-
 	audio_ambient_bees.stream = preload("res://audio/ambient/bees.ogg")
 	audio_ambient_bees.bus = "Bees"
 	add_child(audio_ambient_bees)
@@ -231,7 +226,7 @@ func resume_ingame_music():
 
 
 func change_music_pitch():
-	var pitch_change = current_score / 30000.0
+	var pitch_change = current_score / 90000.0
 	pitch_change = clamp(1.0 + pitch_change, 1.0, 16.0)
 	AudioServer.get_bus_effect(AudioServer.get_bus_index("Music"), 0).set_pitch_scale(pitch_change)
 
@@ -247,6 +242,8 @@ func sound_enemy_died():
 		audio_enemy_dead2.play()
 	else:
 		audio_enemy_dead3.play()
+	var random_pitch_for_woosch = 1.0 + (randf() * 0.2) - 0.1
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("Woosch"), 0).set_pitch_scale(random_pitch_for_woosch)
 	audio_enemy_dead_additional.play()
 
 func start_random_ambient_sounds():
@@ -255,27 +252,20 @@ func start_random_ambient_sounds():
 		await get_tree().create_timer(wait_time).timeout
 		if not audio_ambient_loop_1.playing:
 			break
-		var r = randi() % 4
+		var r = randi() % 3
 		if r == 0:
-			play_door_creak()
-		elif r == 1:
 			play_bees()
-		elif r == 2:
+		elif r == 1:
 			play_birds()
-		elif r == 3:
+		elif r == 2:
 			play_chains()
 
 func stop_random_ambient_sounds():
-	stop_door_creak()
 	stop_bees()
 	stop_birds()
 	stop_chains()
 
 
-func play_door_creak():
-	audio_ambient_door_creak.play()
-func stop_door_creak():
-	audio_ambient_door_creak.stop()
 func play_bees():
 	audio_ambient_bees.play()
 func stop_bees():
