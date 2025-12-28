@@ -14,9 +14,13 @@ extends Node2D
 ## Reference to the viewport for screen bounds
 @export var viewport: SubViewport
 
+## Maximum number of pickups allowed on the map at once
+@export var max_pickups: int = 2
+
 # Internal state
 var time_until_next_spawn: float = 0.0
 var spawn_parent: Node
+var active_pickups: Array[Node] = []  # Track spawned pickups
 
 
 func _ready():
@@ -36,6 +40,9 @@ func _ready():
 
 
 func _process(delta: float):
+	# Clean up invalid pickup references
+	active_pickups = active_pickups.filter(func(pickup): return is_instance_valid(pickup))
+
 	time_until_next_spawn -= delta
 
 	if time_until_next_spawn <= 0:
@@ -47,9 +54,14 @@ func spawn_pickup():
 	if ink_pickup_scene == null or spawn_parent == null:
 		return
 
+	# Don't spawn if we're at max capacity
+	if active_pickups.size() >= max_pickups:
+		return
+
 	var pickup = ink_pickup_scene.instantiate()
 	pickup.global_position = get_random_spawn_position()
 	spawn_parent.add_child(pickup)
+	active_pickups.append(pickup)
 
 
 func get_random_spawn_position() -> Vector2:
@@ -67,3 +79,4 @@ func get_random_spawn_position() -> Vector2:
 
 func reset():
 	time_until_next_spawn = spawn_interval
+	active_pickups.clear()

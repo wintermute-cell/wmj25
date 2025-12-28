@@ -42,6 +42,9 @@ func _ready():
 	# player group for enemy targeting
 	add_to_group("player")
 
+	# set player z_index so it renders on top of dust particles
+	z_index = 1
+
 	# initialize position tracking for dust particles
 	last_position = global_position
 
@@ -106,7 +109,7 @@ func die():
 func spawn_dust_particle():
 	var dust = DUST_TRAIL.instantiate()
 	dust.global_position = global_position
-	dust.z_index = -5  # render behind player but in front of background
+	dust.z_index = 0  # render at default layer (player is at z_index 1)
 	# add to parent so it stays in the world and doesn't follow player
 	get_parent().add_child(dust)
 	# trigger one-shot particle emission

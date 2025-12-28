@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=26 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="Script" uid="uid://bn2t2h2bqedir" path="res://scripts/game.gd" id="1_kvuet"]
 [ext_resource type="Script" uid="uid://bepm072l20xet" path="res://scripts/enemy_spawner.gd" id="2_trtic"]
@@ -15,7 +15,9 @@
 [ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_37s47"]
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="12_bt5mj"]
 [ext_resource type="PackedScene" uid="uid://djlv25g846rld" path="res://LanternHealthBar.tscn" id="13_kvuet"]
+[ext_resource type="Texture2D" uid="uid://cery77t52cff" path="res://sprites/mist.png" id="14_rysoc"]
 [ext_resource type="PackedScene" uid="uid://b70dgj1peoqt5" path="res://scenes/ink_bar.tscn" id="16_rysoc"]
+[ext_resource type="Texture2D" uid="uid://do5t7qh431jcv" path="res://sprites/lantern_glow.png" id="17_ssvqc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kvuet"]
 shader = ExtResource("5_kvpfn")
@@ -35,6 +37,10 @@ size = Vector2(13.333328, 94.54167)
 size = Vector2(64.33336, 12.666655)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6iyv3"]
+
+[sub_resource type="Gradient" id="Gradient_ca42v"]
+offsets = PackedFloat32Array(0, 0.4074733, 0.5747331, 1)
+colors = PackedColorArray(0.43529412, 0.44705883, 0.4509804, 0, 0.37, 0.37, 0.37, 1, 0.36862746, 0.36862746, 0.36862746, 1, 0.43529412, 0.44705883, 0.4509804, 0)
 
 [node name="BrushTesting" type="Node2D"]
 script = ExtResource("1_kvuet")
@@ -72,6 +78,8 @@ render_target_update_mode = 4
 [node name="Brush" parent="CanvasLayer/SubViewportContainer/SubViewport" instance=ExtResource("7_dinhu")]
 z_index = -20
 ink_color = Color(1, 1, 1, 1)
+ink_drain_rate = 20.0
+ink_regen_rate = 2.0
 
 [node name="BrushCapture" type="BackBufferCopy" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 z_index = -10
@@ -161,10 +169,6 @@ shape = SubResource("RectangleShape2D_rysoc")
 [node name="Player" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport" groups=["player"]]
 position = Vector2(81.595, 66.795)
 script = ExtResource("7_ssvqc")
-speed = null
-painting_speed_penalty = null
-max_health = null
-damage_shake_cooldown = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 shape = SubResource("CircleShape2D_6iyv3")
@@ -180,6 +184,98 @@ script = ExtResource("11_37s47")
 brush = NodePath("../Brush")
 wall_root = NodePath("../WallsContainer")
 
+[node name="MistEffect" type="CPUParticles2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+z_index = 10
+position = Vector2(320, 180)
+amount = 10
+texture = ExtResource("14_rysoc")
+lifetime = 12.0
+preprocess = 10.0
+explosiveness = 0.41
+emission_shape = 3
+emission_rect_extents = Vector2(400, 250)
+spread = 24.7
+gravity = Vector2(0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 15.0
+scale_amount_min = 0.3
+color = Color(1, 1, 1, 0.11372549)
+color_ramp = SubResource("Gradient_ca42v")
+
+[node name="EdgeMist" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+z_index = 15
+
+[node name="TopMist" type="CPUParticles2D" parent="CanvasLayer/SubViewportContainer/SubViewport/EdgeMist"]
+position = Vector2(320, -30)
+amount = 20
+texture = ExtResource("14_rysoc")
+lifetime = 8.0
+preprocess = 6.0
+explosiveness = 0.41
+emission_shape = 3
+emission_rect_extents = Vector2(350, 10)
+direction = Vector2(0, 1)
+spread = 24.7
+gravity = Vector2(0, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+scale_amount_min = 0.3
+color = Color(1, 1, 1, 0.105882354)
+color_ramp = SubResource("Gradient_ca42v")
+
+[node name="BottomMist" type="CPUParticles2D" parent="CanvasLayer/SubViewportContainer/SubViewport/EdgeMist"]
+position = Vector2(320, 390)
+amount = 20
+texture = ExtResource("14_rysoc")
+lifetime = 8.0
+preprocess = 6.0
+explosiveness = 0.41
+emission_shape = 3
+emission_rect_extents = Vector2(350, 10)
+direction = Vector2(0, -1)
+spread = 24.7
+gravity = Vector2(0, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+scale_amount_min = 0.3
+color = Color(1, 1, 1, 0.105882354)
+color_ramp = SubResource("Gradient_ca42v")
+
+[node name="LeftMist" type="CPUParticles2D" parent="CanvasLayer/SubViewportContainer/SubViewport/EdgeMist"]
+position = Vector2(-30, 180)
+amount = 20
+texture = ExtResource("14_rysoc")
+lifetime = 8.0
+preprocess = 6.0
+explosiveness = 0.41
+emission_shape = 3
+emission_rect_extents = Vector2(10, 200)
+spread = 24.7
+gravity = Vector2(0, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+scale_amount_min = 0.3
+color = Color(1, 1, 1, 0.105882354)
+color_ramp = SubResource("Gradient_ca42v")
+
+[node name="RightMist" type="CPUParticles2D" parent="CanvasLayer/SubViewportContainer/SubViewport/EdgeMist"]
+position = Vector2(670, 180)
+amount = 20
+texture = ExtResource("14_rysoc")
+lifetime = 8.0
+preprocess = 6.0
+explosiveness = 0.41
+emission_shape = 3
+emission_rect_extents = Vector2(10, 200)
+direction = Vector2(-1, 0)
+spread = 24.7
+gravity = Vector2(0, 0)
+initial_velocity_min = 1.0
+initial_velocity_max = 3.0
+scale_amount_min = 0.3
+color = Color(1, 1, 1, 0.105882354)
+color_ramp = SubResource("Gradient_ca42v")
+
 [node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("12_bt5mj")]
 visible = false
 
@@ -188,24 +284,15 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -88.0
-offset_top = 13.065
+offset_top = 3.0
 offset_right = 88.0
-offset_bottom = 48.065
+offset_bottom = 67.0
 grow_horizontal = 2
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 32
-text = "Score: XXXX"
-
-[node name="HealthBar" type="ProgressBar" parent="CanvasLayer"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -204.0
-offset_top = 60.0
-offset_right = 198.0
-offset_bottom = 80.0
-grow_horizontal = 2
-value = 100.0
+theme_override_font_sizes/font_size = 64
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="LanternHealthBar" parent="CanvasLayer" instance=ExtResource("13_kvuet")]
 offset_left = 960.0
@@ -214,5 +301,9 @@ offset_right = 960.0
 offset_bottom = 55.0
 scale = Vector2(3, 3)
 arc_height = 30.0
+glow_texture = ExtResource("17_ssvqc")
+glow_alpha = 0.1
+glow_scale = 1.4
+glow_flicker_amount = 0.02
 
 [node name="InkBar" parent="CanvasLayer" instance=ExtResource("16_rysoc")]

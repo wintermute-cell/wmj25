@@ -60,7 +60,7 @@ func setup_background_shader():
 
 
 func _on_score_changed(new_score: int):
-	score_label.text = "Score: %d" % new_score
+	score_label.text = "%d" % new_score
 
 
 func _on_health_changed(current_health: float, max_health: float):

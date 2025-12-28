@@ -1,8 +1,14 @@
 - Brush from https://www.davidrevoy.com/article953/krita-brushes-2023-01-bundle
 - font from https://wildleoknight.itch.io/adventurers-scribbles-font
+- https://ragnapixel.itch.io/particle-fx-smoke
+- https://guttykreum.itch.io/japanese-zen-garden
 
 
 Sounds:
+- https://darkworldaudio.itch.io/sound-effects-survival-i
+- https://nox-sound-design.itch.io/essentials-series-sfx-nox-sound
+- https://ad-sounds.itch.io/rewards-loots-sound-effects
+
 - quit https://pixabay.com/sound-effects/nani-japanese-176541/
 - newgame https://pixabay.com/sound-effects/knto-015-94499/
 - lelevfinished https://pixabay.com/sound-effects/koto-hit-106066/
@@ -12,7 +18,6 @@ Sounds:
 - chime https://pixabay.com/sound-effects/chime-2-356833/
 - dead https://pixabay.com/sound-effects/taiko-drum-367656/
 - noodles https://pixabay.com/sound-effects/man-eating-teriyaki-noodles-33320/
-
 
 - brush1 https://pixabay.com/sound-effects/cleaning-a-coat-with-a-brush-77187/
 - brush2 https://pixabay.com/sound-effects/sweeping-38385/
