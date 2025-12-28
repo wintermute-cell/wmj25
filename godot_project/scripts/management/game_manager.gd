@@ -134,7 +134,7 @@ func load_audio():
 	add_child(audio_click_menu_item)
 
 	# ingame music and ambient loops
-	audio_ingame_music.stream = preload("res://audio/music.mp3")
+	audio_ingame_music.stream = preload("res://audio/music_japanese_hack.ogg")
 	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
 

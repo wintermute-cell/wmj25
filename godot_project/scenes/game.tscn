@@ -78,8 +78,8 @@ render_target_update_mode = 4
 [node name="Brush" parent="CanvasLayer/SubViewportContainer/SubViewport" instance=ExtResource("7_dinhu")]
 z_index = -20
 ink_color = Color(1, 1, 1, 1)
-ink_drain_rate = 20.0
-ink_regen_rate = 2.0
+ink_drain_rate = 50.0
+ink_regen_rate = 1.0
 
 [node name="BrushCapture" type="BackBufferCopy" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 z_index = -10
@@ -288,9 +288,10 @@ offset_top = 3.0
 offset_right = 88.0
 offset_bottom = 67.0
 grow_horizontal = 2
-theme_override_constants/outline_size = 4
+theme_override_colors/font_color = Color(0.9515795, 0.95157963, 0.9515795, 1)
+theme_override_constants/outline_size = 12
 theme_override_font_sizes/font_size = 64
-text = "0"
+text = "15300"
 horizontal_alignment = 1
 vertical_alignment = 1
 
