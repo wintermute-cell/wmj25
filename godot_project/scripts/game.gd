@@ -5,6 +5,7 @@ extends Node2D
 @onready var player: CharacterBody2D = $CanvasLayer/SubViewportContainer/SubViewport/Player
 @onready var enemy_spawner: Node2D = $EnemySpawner
 @onready var background: Sprite2D = $CanvasLayer/SubViewportContainer/SubViewport/Background
+@onready var camera: Camera2D = $CanvasLayer/SubViewportContainer/SubViewport/Camera2D
 
 var ghost_texture: Texture2D = preload("res://test_360p_bg_ghost.png")
 var normal_texture: Texture2D = preload("res://test_360p_bg_normal.png")
@@ -22,6 +23,15 @@ func _ready():
 		enemy_spawner.reset()
 
 	setup_background_shader()
+
+	# Connect camera to shake system
+	if camera:
+		CameraShake.set_camera(camera)
+
+
+func _exit_tree():
+	# Clean up camera reference when scene exits
+	CameraShake.clear_camera()
 
 
 func setup_background_shader():

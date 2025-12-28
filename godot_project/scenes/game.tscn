@@ -72,6 +72,9 @@ material = SubResource("ShaderMaterial_kvuet")
 texture = ExtResource("5_trtic")
 centered = false
 
+[node name="Camera2D" type="Camera2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+position = Vector2(320, 180)
+
 [node name="WallsContainer" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 
 [node name="Wall" type="StaticBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport/WallsContainer"]

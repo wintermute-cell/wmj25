@@ -3,7 +3,7 @@
 - loadscreen nice machen
 - game implementation
     <!-- - paint stroke drawing -->
-    - world clipping
+    <!-- - world clipping -->
     <!-- - menuführung -->
     <!-- - game loading -->
     <!-- - restart/gamestate reset -->

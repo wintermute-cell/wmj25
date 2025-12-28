@@ -27,8 +27,8 @@ const ENEMY_LAYER = 3
 
 func _ready():
 	# set up coll layers
-	collision_layer = 1 << (ENEMY_LAYER - 1) # L3
-	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
+	collision_layer = 1 << (ENEMY_LAYER - 1)  # L3
+	collision_mask = 1 << (WALL_LAYER - 1)  # coll with walls (L1)
 
 	# add to enemies group for crunch signal
 	add_to_group("enemies")
@@ -36,8 +36,8 @@ func _ready():
 	# set up player detection area
 	player_detection_area = get_node_or_null("DetectionArea")
 	if player_detection_area and player_detection_area is Area2D:
-		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1) # L3
-		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1) # detect player on L2
+		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1)  # L3
+		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1)  # detect player on L2
 
 		player_detection_area.body_entered.connect(_on_body_entered)
 		player_detection_area.body_exited.connect(_on_body_exited)
@@ -125,7 +125,7 @@ func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 
 
 func crunch():
-	var points = 100 # TODO: calc based on enemy type
+	var points = 100  # TODO: calc based on enemy type
 
 	# spawn crush effect
 	var effect = CRUSH_PARTICLES.instantiate()
@@ -136,4 +136,7 @@ func crunch():
 	GameManager.add_score(points)
 
 	GameManager.sound_enemy_died()
+	# add camera shake on death
+	CameraShake.add_trauma(0.3)
+
 	queue_free()
