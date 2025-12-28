@@ -1,17 +1,17 @@
 [gd_scene load_steps=16 format=3 uid="uid://dn3ral11lw7nj"]
 
-[ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="1_3mqiv"]
-[ext_resource type="Texture2D" uid="uid://bw8360hvlir7n" path="res://space_bg.png" id="1_788mp"]
-[ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scripts/brush.gd" id="1_m53fp"]
-[ext_resource type="Curve" uid="uid://bmr62cjawl152" path="res://brush_config/brush_speed_to_size_curve.tres" id="4_6y5y0"]
-[ext_resource type="Texture2D" uid="uid://bbj1d3ffmt23a" path="res://brush_config/splotch.png" id="4_ojqti"]
-[ext_resource type="Curve" uid="uid://buhtwsalv8a3i" path="res://brush_config/brush_speed_to_sploch_curve.tres" id="5_fkxdt"]
-[ext_resource type="Curve" uid="uid://db8xt4fm7yjw0" path="res://brush_config/brush_speed_to_pool_curve.tres" id="6_3mqiv"]
-[ext_resource type="Texture2D" uid="uid://bqdvxjy8ufhmn" path="res://ghost.png" id="7_fkxdt"]
-[ext_resource type="Script" uid="uid://6dt6me7o43sa" path="res://scripts/player.gd" id="8_jh5vf"]
-[ext_resource type="Script" uid="uid://b1owqutpiap0w" path="res://scripts/enemy.gd" id="10_6iyv3"]
-[ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_6iyv3"]
-[ext_resource type="Texture2D" uid="uid://cyga5l6mm4dxm" path="res://enemy.png" id="11_nyqdd"]
+[ext_resource type="Texture2D" uid="uid://bw8360hvlir7n" path="res://space_bg.png" id="1_dinhu"]
+[ext_resource type="Script" uid="uid://b1kmd5orw7fp3" path="res://scripts/brush.gd" id="2_kvuet"]
+[ext_resource type="Texture2D" uid="uid://bbj1d3ffmt23a" path="res://brush_config/splotch.png" id="3_trtic"]
+[ext_resource type="Curve" uid="uid://bmr62cjawl152" path="res://brush_config/brush_speed_to_size_curve.tres" id="4_ir15t"]
+[ext_resource type="Curve" uid="uid://buhtwsalv8a3i" path="res://brush_config/brush_speed_to_sploch_curve.tres" id="5_ca42v"]
+[ext_resource type="Curve" uid="uid://db8xt4fm7yjw0" path="res://brush_config/brush_speed_to_pool_curve.tres" id="6_rysoc"]
+[ext_resource type="Script" uid="uid://6dt6me7o43sa" path="res://scripts/player.gd" id="7_ssvqc"]
+[ext_resource type="Texture2D" uid="uid://bqdvxjy8ufhmn" path="res://ghost.png" id="8_264po"]
+[ext_resource type="Script" uid="uid://b1owqutpiap0w" path="res://scripts/enemy.gd" id="9_1kice"]
+[ext_resource type="Texture2D" uid="uid://cyga5l6mm4dxm" path="res://enemy.png" id="10_5newe"]
+[ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_37s47"]
+[ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="12_bt5mj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nyqdd"]
 size = Vector2(46, 268)
@@ -41,13 +41,15 @@ size = Vector2i(640, 360)
 render_target_update_mode = 4
 
 [node name="Background" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
-texture = ExtResource("1_788mp")
+texture = ExtResource("1_dinhu")
 centered = false
 
-[node name="Wall" type="StaticBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+[node name="WallsContainer" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+
+[node name="Wall" type="StaticBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport/WallsContainer"]
 collision_mask = 0
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/SubViewportContainer/SubViewport/Wall"]
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/SubViewportContainer/SubViewport/WallsContainer/Wall"]
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 297.33334
@@ -56,30 +58,30 @@ offset_right = 342.33334
 offset_bottom = 309.33337
 grow_vertical = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Wall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/WallsContainer/Wall"]
 position = Vector2(320.33334, 176.66667)
 shape = SubResource("RectangleShape2D_nyqdd")
 
 [node name="Brush" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
-script = ExtResource("1_m53fp")
-brush_texture = ExtResource("4_ojqti")
-splotch_texture = ExtResource("4_ojqti")
-speed_to_size_curve = ExtResource("4_6y5y0")
-speed_to_splotch_curve = ExtResource("5_fkxdt")
-speed_to_pool_curve = ExtResource("6_3mqiv")
+script = ExtResource("2_kvuet")
+brush_texture = ExtResource("3_trtic")
+splotch_texture = ExtResource("3_trtic")
+speed_to_size_curve = ExtResource("4_ir15t")
+speed_to_splotch_curve = ExtResource("5_ca42v")
+speed_to_pool_curve = ExtResource("6_rysoc")
 
 [node name="Player" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport" groups=["player"]]
 position = Vector2(81.595, 66.795)
-script = ExtResource("8_jh5vf")
+script = ExtResource("7_ssvqc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 shape = SubResource("CircleShape2D_6iyv3")
 
 [node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
-texture = ExtResource("7_fkxdt")
+texture = ExtResource("8_264po")
 
 [node name="Enemy" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
-script = ExtResource("10_6iyv3")
+script = ExtResource("9_1kice")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy"]
 shape = SubResource("CircleShape2D_uhfjk")
@@ -92,14 +94,14 @@ collision_mask = 10
 shape = SubResource("CircleShape2D_uhfjk")
 
 [node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Enemy"]
-texture = ExtResource("11_nyqdd")
+texture = ExtResource("10_5newe")
 
 [node name="PaintCollisionManager" type="Node2D" parent="CanvasLayer/SubViewportContainer/SubViewport" node_paths=PackedStringArray("brush", "wall_root")]
-script = ExtResource("11_6iyv3")
+script = ExtResource("11_37s47")
 brush = NodePath("../Brush")
-wall_root = NodePath("..")
+wall_root = NodePath("../WallsContainer")
 
-[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("1_3mqiv")]
+[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("12_bt5mj")]
 visible = false
 
 [node name="Label" type="Label" parent="CanvasLayer"]

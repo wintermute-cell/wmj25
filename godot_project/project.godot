@@ -21,6 +21,7 @@ GameManager="*res://scripts/management/game_manager.gd"
 SceneLoader="*res://scripts/management/scene_loader.gd"
 TransitionLayer="*res://scenes/transition_layer.tscn"
 LoadingScreen="*res://scenes/loading_screen.tscn"
+WallManager="*res://scripts/wall_manager.gd"
 
 [display]
 

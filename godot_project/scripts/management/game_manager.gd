@@ -2,9 +2,9 @@ extends Node
 ## Singleton for managing game state and scene transitions
 
 const MAIN_MENU_PATH = "res://scenes/main_menu.tscn"
-const GAME_PATH = "res://scenes/brush_testing.tscn"
+const GAME_PATH = "res://scenes/game.tscn"
 
-enum GameState {MENU, PLAYING, PAUSED, LOADING}
+enum GameState { MENU, PLAYING, PAUSED, LOADING }
 var current_state: GameState = GameState.MENU
 
 @onready var audio_start_game: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -12,8 +12,8 @@ var current_state: GameState = GameState.MENU
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_dead: AudioStreamPlayer = AudioStreamPlayer.new()
 
-
 var ingame_music_position: float = 0.0
+
 
 func _ready():
 	load_audio()
@@ -35,7 +35,7 @@ func start_game():
 
 
 func return_to_menu():
-	audio_start_game.stop() # just in case its still playing
+	audio_start_game.stop()  # just in case its still playing
 	ingame_music_position = 0.0
 	audio_ingame_music.stop()
 	if current_state == GameState.LOADING:
@@ -79,6 +79,7 @@ func resume_game():
 		current_state = GameState.PLAYING
 		get_tree().paused = false
 
+
 func load_audio():
 	set_music_volume(0.5)
 	set_soundeffects_volume(0.5)
@@ -95,7 +96,6 @@ func load_audio():
 	audio_ingame_music.bus = "Reverb"
 	add_child(audio_ingame_music)
 
-
 	audio_dead.stream = preload("res://audio/dead.mp3")
 	audio_dead.bus = "Soundeffects"
 	add_child(audio_dead)
@@ -109,12 +109,14 @@ func start_ingame_music():
 func resume_ingame_music():
 	audio_ingame_music.play(ingame_music_position)
 
+
 func sound_player_died():
 	audio_dead.play()
 
 
 func set_music_volume(volume: float):
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), volume)
+
 
 func set_soundeffects_volume(volume: float, replay_click: bool = false):
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Soundeffects"), volume)

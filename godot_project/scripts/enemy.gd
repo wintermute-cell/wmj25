@@ -3,6 +3,9 @@ extends CharacterBody2D
 ## speed in px/second
 @export var speed: float = 75.0
 
+# preload particle effect
+const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
+
 ## damage dealt per second when overlapping
 @export var damage_per_second: float = 18.0
 
@@ -83,5 +86,17 @@ func is_point_in_polygon(point: Vector2, polygon: PackedVector2Array) -> bool:
 
 
 func crunch():
-	# TODO: add explo particles, score increment etc..
+	# spawn crush particle effect
+	var particles = CRUSH_PARTICLES.instantiate()
+	particles.global_position = global_position
+	get_parent().add_child(particles)
+
+	# start the particle emission
+	var particle_node = particles.get_node("CPUParticles2D")
+	if particle_node:
+		particle_node.emitting = true
+		# auto-cleanup after particles finish
+		particle_node.finished.connect(particles.queue_free)
+
+	# TODO: score increment
 	queue_free()

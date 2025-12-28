@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://wbyfdxrwuec8"]
+
+[sub_resource type="Curve" id="Curve_t7ou6"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.57491857, 0.19177628), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="EnemyCrush" type="Node2D"]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 16
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 48.79
+initial_velocity_max = 155.49
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+scale_amount_curve = SubResource("Curve_t7ou6")
+color = Color(0.5096737, 0.5438184, 0.94243085, 1)
