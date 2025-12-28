@@ -2,11 +2,11 @@ extends CanvasLayer
 ## Pause menu overlay for the game scene
 
 @onready var container: Control = $Container
-@onready var resume_button: Button = $Container/CenterContainer/Panel/VBoxContainer/ResumeButton
-@onready var restart_button: Button = $Container/CenterContainer/Panel/VBoxContainer/RestartButton
-@onready var menu_button: Button = $Container/CenterContainer/Panel/VBoxContainer/MenuButton
-@onready var music_volume_slider: HSlider = $Container/CenterContainer/Panel/VBoxContainer/MCMusic/MusicSettings/MusicVolumeSlider
-@onready var soundeffects_volume_slider: HSlider = $Container/CenterContainer/Panel/VBoxContainer/MCSoundeffects/SoundEffectSettings/SoundeffectsVolumeSlider
+@onready var resume_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResumeButton
+@onready var restart_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RestartButton
+@onready var menu_button: Button = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MenuButton
+@onready var music_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCMusic/MusicSettings/MusicVolumeSlider
+@onready var soundeffects_volume_slider: HSlider = $Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCSoundeffects/SoundEffectSettings/SoundeffectsVolumeSlider
 
 func _ready():
 	# connect signals for volume sliders

@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://dlehjsdji2u7p"]
+[gd_scene load_steps=3 format=3 uid="uid://dlehjsdji2u7p"]
 
 [ext_resource type="Script" uid="uid://eowugwmcreti" path="res://scripts/ui/pause_menu.gd" id="1_n87rw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n87rw"]
+bg_color = Color(0.2940001, 0.162, 0.36, 1)
 
 [node name="PauseMenu" type="CanvasLayer"]
 script = ExtResource("1_n87rw")
@@ -22,76 +25,80 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="Container/CenterContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="Container/CenterContainer"]
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Container/CenterContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Panel" type="Panel" parent="Container/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_n87rw")
+
+[node name="MarginContainer" type="MarginContainer" parent="Container/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
 alignment = 1
 
-[node name="PausedLabel" type="Label" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="PausedLabel" type="Label" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Paused"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="Spacer" type="Control" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 
-[node name="ResumeButton" type="Button" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="ResumeButton" type="Button" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Resume"
 
-[node name="RestartButton" type="Button" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="RestartButton" type="Button" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Restart"
 
-[node name="MenuButton" type="Button" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="MenuButton" type="Button" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Main Menu"
 
-[node name="MCMusic" type="MarginContainer" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="MCMusic" type="MarginContainer" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="MusicSettings" type="HBoxContainer" parent="Container/CenterContainer/Panel/VBoxContainer/MCMusic"]
+[node name="MusicSettings" type="HBoxContainer" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCMusic"]
 layout_mode = 2
 
-[node name="MusicLabel" type="Label" parent="Container/CenterContainer/Panel/VBoxContainer/MCMusic/MusicSettings"]
+[node name="MusicLabel" type="Label" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCMusic/MusicSettings"]
 layout_mode = 2
 text = "Music"
 
-[node name="MusicVolumeSlider" type="HSlider" parent="Container/CenterContainer/Panel/VBoxContainer/MCMusic/MusicSettings"]
+[node name="MusicVolumeSlider" type="HSlider" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCMusic/MusicSettings"]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 1.0
 step = 0.1
 value = 0.5
 
-[node name="MCSoundeffects" type="MarginContainer" parent="Container/CenterContainer/Panel/VBoxContainer"]
+[node name="MCSoundeffects" type="MarginContainer" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="SoundEffectSettings" type="HBoxContainer" parent="Container/CenterContainer/Panel/VBoxContainer/MCSoundeffects"]
+[node name="SoundEffectSettings" type="HBoxContainer" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCSoundeffects"]
 layout_mode = 2
 
-[node name="SoundLabel" type="Label" parent="Container/CenterContainer/Panel/VBoxContainer/MCSoundeffects/SoundEffectSettings"]
+[node name="SoundLabel" type="Label" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCSoundeffects/SoundEffectSettings"]
 layout_mode = 2
 text = "Sound"
 
-[node name="SoundeffectsVolumeSlider" type="HSlider" parent="Container/CenterContainer/Panel/VBoxContainer/MCSoundeffects/SoundEffectSettings"]
+[node name="SoundeffectsVolumeSlider" type="HSlider" parent="Container/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MCSoundeffects/SoundEffectSettings"]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 1.0
