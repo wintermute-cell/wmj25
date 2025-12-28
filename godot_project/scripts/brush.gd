@@ -64,6 +64,15 @@ class InkPoint:
 ## How often (in seconds) to clean up dried ink points. Lower = more accurate fading but slower, higher = better performance
 @export_range(0.0, 0.5, 0.05) var cleanup_interval: float = 0.5
 
+# Ink capacity settings
+@export_group("Ink Capacity")
+## Maximum ink capacity
+@export_range(50.0, 500.0, 10.0) var max_ink: float = 100.0
+## Ink consumed per second while painting
+@export_range(1.0, 50.0, 1.0) var ink_drain_rate: float = 15.0
+## Ink regenerated per second when not painting
+@export_range(1.0, 30.0, 1.0) var ink_regen_rate: float = 8.0
+
 # Speed-based size settings
 @export_group("Speed to Size")
 ## Maximum speed value (in pixels/sec) that maps to 1.0 on the speed_to_size_curve. Speeds above this are clamped.
@@ -118,6 +127,9 @@ class InkPoint:
 ## How far lift pools spread from the end point (as multiplier of brush size)
 @export_range(0.0, 5.0, 0.1) var lift_pool_spread: float = 1.0
 
+# Signals
+signal ink_changed(current_ink: float, max_ink: float)
+
 # stroke state
 var ink_points: Array[InkPoint] = []
 var is_drawing: bool = false
@@ -128,9 +140,17 @@ var stroke_start_time: float = 0.0
 var accumulated_distance: float = 0.0
 var cleanup_timer: float = 0.0 # timer for periodic cleanup
 var smoothed_size: float = 0.0 # smoothed brush size to prevent rapid changes
+var current_ink: float = 100.0 # current ink level
 
 
 func _ready():
+	# add to brush group for pickups to find
+	add_to_group("brush")
+
+	# initialize ink
+	current_ink = max_ink
+	ink_changed.emit(current_ink, max_ink)
+
 	# default curves if none are set
 	if speed_to_size_curve == null:
 		speed_to_size_curve = Curve.new()
@@ -152,6 +172,16 @@ func _ready():
 func _process(delta: float):
 	current_time += delta
 	cleanup_timer += delta
+
+	# regenerate ink when not drawing
+	if not is_drawing and current_ink < max_ink:
+		current_ink = min(current_ink + ink_regen_rate * delta, max_ink)
+		ink_changed.emit(current_ink, max_ink)
+
+	# drain ink when drawing
+	if is_drawing and current_ink > 0:
+		current_ink = max(current_ink - ink_drain_rate * delta, 0.0)
+		ink_changed.emit(current_ink, max_ink)
 
 	# periodically clean up dried points instead of every frame
 	if cleanup_timer >= cleanup_interval:
@@ -179,16 +209,18 @@ func _input(event: InputEvent):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				# new stroke
-				is_drawing = true
-				last_draw_position = event.position
-				last_velocity = Vector2.ZERO
-				stroke_start_time = current_time
-				accumulated_distance = 0.0
-				smoothed_size = brush_min_size
-				# initial touch is small and clean
-				add_ink_splatter(event.position, Vector2.ZERO, true)
-				GameManager.start_playing_brush_stroke()
+				# can only start drawing if we have ink
+				if current_ink > 0:
+					# new stroke
+					is_drawing = true
+					last_draw_position = event.position
+					last_velocity = Vector2.ZERO
+					stroke_start_time = current_time
+					accumulated_distance = 0.0
+					smoothed_size = brush_min_size
+					# initial touch is small and clean
+					add_ink_splatter(event.position, Vector2.ZERO, true)
+					GameManager.start_playing_brush_stroke()
 			else:
 				# lift brush
 				if is_drawing:
@@ -198,6 +230,12 @@ func _input(event: InputEvent):
 
 	elif event is InputEventMouseMotion:
 		if is_drawing:
+			# stop drawing if we run out of ink mid-stroke
+			if current_ink <= 0:
+				is_drawing = false
+				GameManager.stop_playing_brush_stroke()
+				return
+
 			var current_position = event.position
 			var velocity = event.velocity
 
@@ -409,3 +447,9 @@ func _draw():
 		else:
 			# fallback to circle
 			draw_circle(point.position, current_size, color_with_alpha)
+
+
+## Restore ink (called when picking up ink pickups)
+func add_ink(amount: float):
+	current_ink = min(current_ink + amount, max_ink)
+	ink_changed.emit(current_ink, max_ink)

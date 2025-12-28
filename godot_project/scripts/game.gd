@@ -2,8 +2,11 @@ extends Node2D
 
 @onready var score_label: Label = $CanvasLayer/ScoreLabel
 @onready var health_bar = $CanvasLayer/LanternHealthBar
+@onready var ink_bar = $CanvasLayer/InkBar
 @onready var player: CharacterBody2D = $CanvasLayer/SubViewportContainer/SubViewport/Player
+@onready var brush = $CanvasLayer/SubViewportContainer/SubViewport/Brush
 @onready var enemy_spawner: Node2D = $EnemySpawner
+@onready var ink_pickup_spawner: Node2D = $InkPickupSpawner
 @onready var background: Sprite2D = $CanvasLayer/SubViewportContainer/SubViewport/Background
 @onready var camera: Camera2D = $CanvasLayer/SubViewportContainer/SubViewport/Camera2D
 
@@ -19,8 +22,14 @@ func _ready():
 	if player:
 		player.health_changed.connect(_on_health_changed)
 
+	if brush:
+		brush.ink_changed.connect(_on_ink_changed)
+
 	if enemy_spawner:
 		enemy_spawner.reset()
+
+	if ink_pickup_spawner:
+		ink_pickup_spawner.reset()
 
 	setup_background_shader()
 
@@ -57,3 +66,8 @@ func _on_score_changed(new_score: int):
 func _on_health_changed(current_health: float, max_health: float):
 	if health_bar and health_bar.has_method("update_health"):
 		health_bar.update_health(current_health, max_health)
+
+
+func _on_ink_changed(current_ink: float, max_ink: float):
+	if ink_bar and ink_bar.has_method("update_ink"):
+		ink_bar.update_ink(current_ink, max_ink)

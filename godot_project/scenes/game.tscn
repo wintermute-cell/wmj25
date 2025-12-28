@@ -1,10 +1,12 @@
-[gd_scene load_steps=20 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=23 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="Script" uid="uid://bn2t2h2bqedir" path="res://scripts/game.gd" id="1_kvuet"]
 [ext_resource type="Script" uid="uid://bepm072l20xet" path="res://scripts/enemy_spawner.gd" id="2_trtic"]
 [ext_resource type="Curve" uid="uid://deuxxc1havrap" path="res://enemy_spawner_curve.tres" id="4_ca42v"]
+[ext_resource type="Script" uid="uid://b7radvjl11kwa" path="res://scripts/ink_pickup_spawner.gd" id="5_ir15t"]
 [ext_resource type="Shader" uid="uid://pomj4joulvt3" path="res://shaders/background_reveal.gdshader" id="5_kvpfn"]
 [ext_resource type="Texture2D" uid="uid://jat2pri82s4m" path="res://test_360p_bg_ghost.png" id="5_trtic"]
+[ext_resource type="PackedScene" uid="uid://c565bscbexpex" path="res://scenes/ink_pickup.tscn" id="6_ca42v"]
 [ext_resource type="PackedScene" uid="uid://cjjce806lcqtl" path="res://scenes/brush.tscn" id="7_dinhu"]
 [ext_resource type="Texture2D" uid="uid://bmsruudsxfqd" path="res://test_360p_bg_normal.png" id="7_kvuet"]
 [ext_resource type="Script" uid="uid://6dt6me7o43sa" path="res://scripts/player.gd" id="7_ssvqc"]
@@ -13,6 +15,7 @@
 [ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_37s47"]
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="12_bt5mj"]
 [ext_resource type="PackedScene" uid="uid://djlv25g846rld" path="res://LanternHealthBar.tscn" id="13_kvuet"]
+[ext_resource type="PackedScene" uid="uid://b70dgj1peoqt5" path="res://scenes/ink_bar.tscn" id="16_rysoc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kvuet"]
 shader = ExtResource("5_kvpfn")
@@ -41,6 +44,11 @@ script = ExtResource("2_trtic")
 enemy_scene = ExtResource("10_dinhu")
 difficulty_ramp_duration = 300.0
 difficulty_curve = ExtResource("4_ca42v")
+viewport = NodePath("../CanvasLayer/SubViewportContainer/SubViewport")
+
+[node name="InkPickupSpawner" type="Node2D" parent="." node_paths=PackedStringArray("viewport")]
+script = ExtResource("5_ir15t")
+ink_pickup_scene = ExtResource("6_ca42v")
 viewport = NodePath("../CanvasLayer/SubViewportContainer/SubViewport")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -153,6 +161,10 @@ shape = SubResource("RectangleShape2D_rysoc")
 [node name="Player" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport" groups=["player"]]
 position = Vector2(81.595, 66.795)
 script = ExtResource("7_ssvqc")
+speed = null
+painting_speed_penalty = null
+max_health = null
+damage_shake_cooldown = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 shape = SubResource("CircleShape2D_6iyv3")
@@ -202,3 +214,5 @@ offset_right = 960.0
 offset_bottom = 55.0
 scale = Vector2(3, 3)
 arc_height = 30.0
+
+[node name="InkBar" parent="CanvasLayer" instance=ExtResource("16_rysoc")]

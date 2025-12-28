@@ -15,8 +15,15 @@ extends CharacterBody2D
 ## Time between camera shakes when taking damage
 @export var damage_shake_cooldown: float = 0.3
 
+## Distance player must move before spawning next dust particle
+@export var dust_spawn_distance: float = 50.0
+
 var health: float = 100.0
 var last_damage_shake_time: float = -999.0  # Track last shake time
+var distance_since_last_dust: float = 0.0
+var last_position: Vector2
+
+const DUST_TRAIL = preload("res://scenes/dust_trail.tscn")
 
 signal health_changed(current_health: float, max_health: float)
 
@@ -34,6 +41,9 @@ func _ready():
 
 	# player group for enemy targeting
 	add_to_group("player")
+
+	# initialize position tracking for dust particles
+	last_position = global_position
 
 
 func _physics_process(delta: float):
@@ -60,6 +70,17 @@ func _physics_process(delta: float):
 		position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y
 	)
 
+	# spawn dust trail particles when moving
+	if velocity.length() > 0:
+		var distance_moved = global_position.distance_to(last_position)
+		distance_since_last_dust += distance_moved
+
+		if distance_since_last_dust >= dust_spawn_distance:
+			spawn_dust_particle()
+			distance_since_last_dust = 0.0
+
+	last_position = global_position
+
 
 func take_damage(amount: float):
 	health -= amount
@@ -80,3 +101,15 @@ func die():
 	print("Player died!")
 	# TODO: impl death behavior (particle, game over, etc..)
 	queue_free()
+
+
+func spawn_dust_particle():
+	var dust = DUST_TRAIL.instantiate()
+	dust.global_position = global_position
+	dust.z_index = -5  # render behind player but in front of background
+	# add to parent so it stays in the world and doesn't follow player
+	get_parent().add_child(dust)
+	# trigger one-shot particle emission
+	var particles = dust.get_node("Particles")
+	if particles:
+		particles.emitting = true

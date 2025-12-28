@@ -1,30 +1,122 @@
-[gd_scene load_steps=3 format=3 uid="uid://wbyfdxrwuec8"]
+[gd_scene load_steps=17 format=3 uid="uid://wbyfdxrwuec8"]
 
 [ext_resource type="Script" uid="uid://b05byc67743iy" path="res://scripts/enemy_crush_effect.gd" id="1_e3ijj"]
+[ext_resource type="Texture2D" uid="uid://cvd0f4aqrglrx" path="res://brush_config/brush.png" id="2_6yayt"]
+[ext_resource type="Texture2D" uid="uid://b1ru2kqtjgtxe" path="res://sprites/crunch_smoke.png" id="2_mia8d"]
 
 [sub_resource type="Curve" id="Curve_t7ou6"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.57491857, 0.19177628), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.39576548, 0), 0.0, 0.0, 0, 0]
 point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_6yayt"]
+colors = PackedColorArray(0.36, 0.36, 0.36, 1, 1, 1, 1, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6yayt"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_metph"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3qhoi"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j6el6"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_opk3h"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2jjlw"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3wfwi"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bloi5"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_grywb"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_71d1q"]
+atlas = ExtResource("2_mia8d")
+region = Rect2(576, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nji28"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6yayt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_metph")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3qhoi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j6el6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_opk3h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2jjlw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3wfwi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bloi5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_grywb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_71d1q")
+}],
+"loop": false,
+"name": &"death",
+"speed": 15.0
+}]
 
 [node name="EnemyCrush" type="Node2D"]
 script = ExtResource("1_e3ijj")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="."]
-emitting = false
 amount = 16
-one_shot = true
+texture = ExtResource("2_6yayt")
 explosiveness = 1.0
+randomness = 1.0
 spread = 180.0
-gravity = Vector2(0, 100)
-initial_velocity_min = 48.79
-initial_velocity_max = 155.49
-scale_amount_min = 4.0
-scale_amount_max = 6.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 27.45
+initial_velocity_max = 103.66
+scale_amount_min = 0.1
+scale_amount_max = 0.3
 scale_amount_curve = SubResource("Curve_t7ou6")
-color = Color(0.9422341, 0.3670708, 0.44207492, 1)
+color = Color(0.49, 0.37109333, 0.3528, 1)
+color_initial_ramp = SubResource("Gradient_6yayt")
+hue_variation_min = -0.67
+hue_variation_max = 0.77
 
 [node name="ScoreLabel" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 16.0
 theme_override_constants/outline_size = 4
 text = "100"
+
+[node name="DeathAnimation" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_nji28")
+animation = &"death"
+frame = 9
+frame_progress = 1.0
