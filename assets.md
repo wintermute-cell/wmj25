@@ -20,3 +20,9 @@ Sounds:
 - pouring https://pixabay.com/sound-effects/pouring-30588/
 - bubble https://pixabay.com/sound-effects/bubble-pop-293342/
 - wusch https://pixabay.com/sound-effects/vintage-camera-flash-powder-and-shutter-6243/
+- breath https://pixabay.com/sound-effects/breath-264957/
+- bell https://pixabay.com/sound-effects/bell-toll-407826/
+- bloodsplash https://pixabay.com/sound-effects/breeze-of-blood-122253/
+- breaking1 https://pixabay.com/sound-effects/bone-break-sound-ver-2-269660/
+- breaking2 https://pixabay.com/sound-effects/bone-snap-408148/
+- breaking3 https://pixabay.com/sound-effects/bone-break-8-218516/
