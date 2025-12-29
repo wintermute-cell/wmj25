@@ -58,10 +58,14 @@ func _on_resume_pressed():
 
 
 func _on_restart_pressed():
-	_hide_pause_menu()
+	# Don't unpause - keep game paused during scene transition
+	visible = false
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	GameManager.restart_game()
 
 
 func _on_menu_pressed():
-	_hide_pause_menu()
+	# Don't unpause - keep game paused during scene transition
+	visible = false
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	GameManager.return_to_menu()

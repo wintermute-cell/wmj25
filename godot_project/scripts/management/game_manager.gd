@@ -112,6 +112,7 @@ func return_to_menu():
 	stop_ingame_music()
 	stop_ambient_sounds()
 	reset_music_pitch()
+	get_tree().paused = false  # Unpause before freeing the scene
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -130,6 +131,7 @@ func restart_game():
 	stop_ingame_music()
 	stop_ambient_sounds()
 	ingame_music_position = 0.0
+	get_tree().paused = false  # Unpause before freeing the scene
 	audio_start_game.play()
 	start_ingame_music()
 	start_ambient_sounds()
