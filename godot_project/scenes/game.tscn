@@ -127,6 +127,7 @@ viewport = NodePath("../CanvasLayer/SubViewportContainer/SubViewport")
 [node name="InkPickupSpawner" type="Node2D" parent="." node_paths=PackedStringArray("viewport")]
 script = ExtResource("5_ir15t")
 ink_pickup_scene = ExtResource("6_ca42v")
+spawn_interval = 25.0
 viewport = NodePath("../CanvasLayer/SubViewportContainer/SubViewport")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
