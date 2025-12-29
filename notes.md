@@ -18,6 +18,7 @@
 - balancing!!
 - manuell testen ob fun ist und nicht irgendwann breaked!
 - web build nochmal testen
-- tutorial
+<!-- - tutorial -->
 - player death behaviour
 - ult indicator via cursor outline
+- screenshake on restart broken

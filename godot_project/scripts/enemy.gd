@@ -20,7 +20,7 @@ const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
 @export var player: CharacterBody2D
 
 
-# player overlap detection (via Area2D child)
+# player overlap detection via area2d child
 var player_detection_area: Area2D
 var is_touching_player: bool = false
 
@@ -45,8 +45,8 @@ const SPRINTER_SPEED_SPRINTING: float = 200.0
 
 func _ready():
 	# set up coll layers
-	collision_layer = 1 << (ENEMY_LAYER - 1) # L3
-	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
+	collision_layer = 1 << (ENEMY_LAYER - 1) # layer 3
+	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls layer 1
 
 	# add to enemies group for crunch signal
 	add_to_group("enemies")
@@ -67,17 +67,16 @@ func _ready():
 	# set up player detection area
 	player_detection_area = get_node_or_null("DetectionArea")
 	if player_detection_area and player_detection_area is Area2D:
-		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1) # L3
-		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1) # detect player on L2
+		player_detection_area.collision_layer = 1 << (ENEMY_LAYER - 1) # layer 3
+		player_detection_area.collision_mask = 1 << (PLAYER_LAYER - 1) # detect player on layer 2
 
 		player_detection_area.body_entered.connect(_on_body_entered)
 		player_detection_area.body_exited.connect(_on_body_exited)
 	else:
 		push_warning("Enemy: No DetectionArea child found, no player damage possible")
 
-	# find player if not assigned
-	if player == null:
-		player = get_tree().get_first_node_in_group("player")
+	# always find player, refresh in case of scene reload
+	player = get_tree().get_first_node_in_group("player")
 
 
 func _process(delta: float) -> void:
@@ -178,7 +177,7 @@ func change_enemy_type(new_type: int):
 		$AnimatedSpriteDasher.hide()
 		$AnimatedSpriteSprinter.show()
 
-# dash behaviour (kinda wonky)
+# dash behaviour, kinda wonky
 func dash_towards_player():
 	if player != null and is_instance_valid(player):
 		is_dashing = true
@@ -226,7 +225,7 @@ func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 		return true
 
 	# check if enemy circle overlaps with polygon
-	# method: check if any polygon edge is within (radius + margin) of enemy center
+	# method, check if any polygon edge is within radius + margin of enemy center
 	for i in range(polygon.size()):
 		var p1 = polygon[i]
 		var p2 = polygon[(i + 1) % polygon.size()]
@@ -243,16 +242,16 @@ func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 
 
 func crunch():
-	var base_points = 100 # TODO: calc based on enemy type
+	var base_points = 100 # todo calc based on enemy type
 
-	# Register kill and get combo multiplier
+	# register kill and get combo multiplier
 	var combo_data = GameManager.register_kill()
 	var multiplier = combo_data.multiplier
 
-	# Calculate final score with multiplier
+	# calculate final score with multiplier
 	var final_points = int(base_points * multiplier)
 
-	# spawn crush effect (score only, no combo text)
+	# spawn crush effect, score only no combo text
 	var effect = CRUSH_PARTICLES.instantiate()
 	effect.global_position = global_position
 	effect.score_value = final_points

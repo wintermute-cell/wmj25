@@ -10,10 +10,10 @@ var current_state: GameState = GameState.MENU
 var current_score: int = 0
 signal score_changed(new_score: int)
 
-# tutorial state (resets on page reload)
+# tutorial state, resets on page reload
 var tutorial_shown: bool = false
 
-# Combo system
+# combo system
 var kill_timestamps: Array[float] = []
 var combo_window: float = 0.6 ## Time window in seconds for combo kills
 var combo_tiers: Array[Dictionary] = [
@@ -72,18 +72,18 @@ func _ready():
 
 
 func _process(delta: float):
-	# Check if burst has ended and show combo popup for highest tier
+	# check if burst has ended and show combo popup for highest tier
 	if burst_active:
 		burst_timer += delta
-		# If enough time has passed since last kill, burst has ended
+		# if enough time has passed since last kill, burst has ended
 		if burst_timer >= burst_window:
 			if highest_tier_in_burst != -1:
-				# Show combo popup for the highest tier reached in the burst
+				# show combo popup for the highest tier reached in the burst
 				var tier_data = combo_tiers[highest_tier_in_burst]
 				var multiplier = tier_data.multiplier
 				var min_kills = tier_data.min_kills
 				combo_achieved.emit(multiplier, min_kills)
-			# Reset burst
+			# reset burst
 			burst_active = false
 			highest_tier_in_burst = -1
 
@@ -112,7 +112,15 @@ func return_to_menu():
 	stop_ingame_music()
 	stop_ambient_sounds()
 	reset_music_pitch()
-	get_tree().paused = false  # Unpause before freeing the scene
+
+	# stop the current scene from processing immediately
+	var current_scene = get_tree().current_scene
+	if current_scene:
+		current_scene.process_mode = Node.PROCESS_MODE_DISABLED
+
+	# unpause tree so transitions can work
+	get_tree().paused = false
+
 	if current_state == GameState.LOADING:
 		return
 	current_state = GameState.LOADING
@@ -131,7 +139,15 @@ func restart_game():
 	stop_ingame_music()
 	stop_ambient_sounds()
 	ingame_music_position = 0.0
-	get_tree().paused = false  # Unpause before freeing the scene
+
+	# stop the current scene from processing immediately
+	var current_scene = get_tree().current_scene
+	if current_scene:
+		current_scene.process_mode = Node.PROCESS_MODE_DISABLED
+
+	# unpause tree so transitions can work
+	get_tree().paused = false
+
 	audio_start_game.play()
 	start_ingame_music()
 	start_ambient_sounds()
@@ -179,24 +195,24 @@ func add_score(points: int):
 func register_kill() -> Dictionary:
 	var current_time = Time.get_ticks_msec() / 1000.0
 
-	# Add current kill timestamp
+	# add current kill timestamp
 	kill_timestamps.append(current_time)
 
-	# Remove timestamps outside the combo window
+	# remove timestamps outside the combo window
 	var cutoff_time = current_time - combo_window
 	var old_size = kill_timestamps.size()
 	kill_timestamps = kill_timestamps.filter(func(t): return t >= cutoff_time)
 
-	# Reset combo tier if timestamps were cleaned up (combo expired)
+	# reset combo tier if timestamps were cleaned up
 	if kill_timestamps.size() < old_size:
 		current_combo_tier = -1
 		highest_tier_in_burst = -1
 		burst_active = false
 
-	# Count kills in window
+	# count kills in window
 	var kill_count = kill_timestamps.size()
 
-	# Determine multiplier and tier index based on kill count
+	# determine multiplier and tier index based on kill count
 	var multiplier = 1.0
 	var new_tier = -1
 	for tier_index in range(combo_tiers.size()):
@@ -205,38 +221,38 @@ func register_kill() -> Dictionary:
 			new_tier = tier_index
 			break
 
-	# Check if this kill is part of a burst (happened soon after last kill)
+	# check if this kill is part of a burst
 	var time_since_last_kill = current_time - last_kill_time
 	var is_burst = time_since_last_kill < burst_window
 
 	last_kill_time = current_time
 
-	# Update current tier
+	# update current tier
 	if new_tier != -1:
 		current_combo_tier = new_tier
 	else:
 		current_combo_tier = -1
 
-	# Track burst and highest tier in burst
+	# track burst and highest tier in burst
 	var show_combo = false
 	if new_tier != -1:
 		if is_burst:
-			# Part of existing burst - track highest tier
+			# part of existing burst, track highest tier
 			burst_active = true
 			burst_timer = 0.0
 			if new_tier < highest_tier_in_burst or highest_tier_in_burst == -1:
 				highest_tier_in_burst = new_tier
 		else:
-			# New burst starting - show popup for highest tier from previous burst if any
+			# new burst starting, show popup for highest tier from previous burst if any
 			if burst_active and highest_tier_in_burst != -1:
-				# Previous burst ended, but don't show popup here (will be shown in _process)
+				# previous burst ended, dont show popup here, will be shown in _process
 				pass
-			# Start new burst
+			# start new burst
 			burst_active = true
 			burst_timer = 0.0
 			highest_tier_in_burst = new_tier
 	else:
-		# No combo, reset burst
+		# no combo, reset burst
 		burst_active = false
 		highest_tier_in_burst = -1
 
@@ -346,7 +362,7 @@ func set_ambient_volume(volume: float):
 
 
 ##################
-# Playback control
+# playback control
 func start_ingame_music():
 	await audio_start_game.finished
 	audio_ingame_music.play(ingame_music_position)

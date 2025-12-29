@@ -1,27 +1,26 @@
 [gd_scene load_steps=5 format=3 uid="uid://c565bscbexpex"]
 
 [ext_resource type="Script" uid="uid://dfesjatx2kuk2" path="res://scripts/ink_pickup.gd" id="1_17pkv"]
-[ext_resource type="Texture2D" uid="uid://ctwa8y18xgov8" path="res://icon.svg" id="2_ee384"]
+[ext_resource type="Texture2D" uid="uid://dbv6doay55pwq" path="res://sprites/ink_pickup.png" id="3_ee384"]
 [ext_resource type="Texture2D" uid="uid://cw1xtvn5iuhv" path="res://sprites/pickup_spawn_smoke.png" id="3_smoke"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3d0xk"]
 
 [node name="InkPickup" type="Area2D"]
 script = ExtResource("1_17pkv")
+pickup_color = Color(0.8, 0.8, 0.8, 0.6)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_3d0xk")
 
 [node name="SmokeSprite" type="Sprite2D" parent="."]
 z_index = -1
-position = Vector2(0, 8)
+position = Vector2(0, -26)
 texture = ExtResource("3_smoke")
 hframes = 13
-frame = 0
 
 [node name="PickupVisual" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="PickupVisual"]
 position = Vector2(0.25000024, -0.25)
-scale = Vector2(0.12109375, 0.12890625)
-texture = ExtResource("2_ee384")
+texture = ExtResource("3_ee384")

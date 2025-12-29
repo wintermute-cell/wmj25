@@ -28,7 +28,7 @@ extends CharacterBody2D
 @export var max_ult_charge: float = 100.0
 
 var health: float = 100.0
-var last_damage_shake_time: float = -999.0 # Track last shake time
+var last_damage_shake_time: float = -999.0 # track last shake time
 var distance_since_last_dust: float = 0.0
 var last_position: Vector2
 var ult_charge: float = 0.0
@@ -49,8 +49,8 @@ const PLAYER_LAYER = 2
 
 
 func _ready():
-	collision_layer = 1 << (PLAYER_LAYER - 1) # L2
-	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
+	collision_layer = 1 << (PLAYER_LAYER - 1) # layer 2
+	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls layer 1
 
 	health = max_health
 	health_changed.emit(health, max_health)
@@ -68,8 +68,18 @@ func _ready():
 	last_position = global_position
 
 
+func _process(delta: float):
+	# play animation only when moving
+	var sprite = get_node_or_null("AnimatedSprite2D")
+	if sprite:
+		if velocity.length() > 0:
+			sprite.play()
+		else:
+			sprite.stop()
+
+
 func _physics_process(delta: float):
-	# ult activation (E key)
+	# ult activation, E key
 	var e_key_is_pressed = Input.is_physical_key_pressed(KEY_E)
 	if e_key_is_pressed and not e_key_was_pressed:
 		if is_ult_active:
@@ -89,17 +99,27 @@ func _physics_process(delta: float):
 
 	velocity = input_dir * current_speed
 
+	# flip sprite based on movement direction
+	var sprite = get_node_or_null("AnimatedSprite2D")
+	if sprite:
+		if velocity.x < 0:
+			sprite.flip_h = true
+		elif velocity.x > 0:
+			sprite.flip_h = false
+
 	move_and_slide()
 
 	# check if player is out of bounds and clamp pos
 	var viewport_rect = get_viewport_rect()
-	var player_size_half = get_node("Sprite2D").texture.get_size() / 2
-	position.x = clamp(
-		position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x
-	)
-	position.y = clamp(
-		position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y
-	)
+	var sprite_node = get_node_or_null("AnimatedSprite2D")
+	if sprite_node and sprite_node.sprite_frames:
+		var player_size_half = Vector2(24, 24) / 2  # 24x24 sprite
+		position.x = clamp(
+			position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x
+		)
+		position.y = clamp(
+			position.y, 0 + player_size_half.y, viewport_rect.size.y - player_size_half.y
+		)
 
 	# spawn dust trail particles when moving
 	if velocity.length() > 0:
@@ -112,7 +132,7 @@ func _physics_process(delta: float):
 
 	last_position = global_position
 
-	# ult timer (use unscaled delta since Engine time_scale affects delta)
+	# ult timer, use unscaled delta since time_scale affects delta
 	if is_ult_active:
 		ult_time_remaining -= delta / Engine.time_scale
 		if ult_time_remaining <= 0:
@@ -120,11 +140,11 @@ func _physics_process(delta: float):
 
 
 func take_damage(amount: float, enemy_type: int = 0):
-	if enemy_type == 2: # dasher sound
+	if enemy_type == 2: # dasher
 		if $HitTimerSprinter.is_stopped():
 			GameManager.play_player_hit(enemy_type)
 			$HitTimerSprinter.start()
-	else: # normal hit sound
+	else: # normal hit
 		if $HitTimerNormal.is_stopped():
 			GameManager.play_player_hit()
 			$HitTimerNormal.start()
@@ -150,14 +170,14 @@ func die():
 		is_ult_active = false
 
 	print("Player died!")
-	# TODO: impl death behavior (particle, game over, etc)
+	# todo impl death behavior
 	queue_free()
 
 
 func spawn_dust_particle():
 	var dust = DUST_TRAIL.instantiate()
 	dust.global_position = global_position
-	dust.z_index = 0  # render at default layer (player is at z_index 1)
+	dust.z_index = 0  # render at default layer
 	# add to parent so it stays in world and doesn't follow player
 	get_parent().add_child(dust)
 	# trigger one shot particle emission

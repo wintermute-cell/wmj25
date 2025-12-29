@@ -51,7 +51,7 @@ func load_scene(scene_path: String):
 		is_loading = false
 		return
 
-	# ensure minimum loading time has elapsed BEFORE switching scenes
+	# ensure minimum loading time has elapsed before switching scenes
 	var elapsed_time = (Time.get_ticks_msec() / 1000.0) - loading_start_time
 	var remaining_time = min_loading_time - elapsed_time
 	if remaining_time > 0:
@@ -62,10 +62,10 @@ func load_scene(scene_path: String):
 	TransitionLayer.transition_out()
 	await TransitionLayer.transition_finished
 
-	# hide loading screen (behind black)
+	# hide loading screen behind black
 	loading_finished.emit()
 
-	# switch scenes (hidden behind black)
+	# switch scenes hidden behind black
 	print("[SceneLoader] Switching to new scene")
 	_change_to_scene(packed_scene)
 
@@ -105,7 +105,9 @@ func _change_to_scene(packed_scene: PackedScene):
 	# clean up old scene
 	var old_scene = get_tree().current_scene
 	if old_scene:
-		old_scene.queue_free()
+		# clear current_scene ref first, then free immediately
+		get_tree().current_scene = null
+		old_scene.free()
 
 	# instance and add new scene
 	var new_scene = packed_scene.instantiate()

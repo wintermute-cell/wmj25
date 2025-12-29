@@ -12,18 +12,21 @@ script = ExtResource("1_3o41p")
 ink_levels = 16
 
 [node name="InkSprite" type="Sprite2D" parent="."]
+position = Vector2(9, 0)
 texture = ExtResource("2_x5200")
 centered = false
 hframes = 16
 
 [node name="SplashSprite" type="Sprite2D" parent="."]
 visible = false
+position = Vector2(9, 0)
 texture = ExtResource("3_kbnj3")
 centered = false
 hframes = 3
 
 [node name="WarningSprite" type="Sprite2D" parent="."]
 visible = false
+position = Vector2(9, 0)
 texture = ExtResource("4_d307b")
 centered = false
 hframes = 2

@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=32 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="Script" uid="uid://bn2t2h2bqedir" path="res://scripts/game.gd" id="1_kvuet"]
 [ext_resource type="Script" uid="uid://bepm072l20xet" path="res://scripts/enemy_spawner.gd" id="2_trtic"]
@@ -14,7 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://d257nqp3u5byv" path="res://scenes/enemy.tscn" id="10_dinhu"]
 [ext_resource type="Script" uid="uid://c6bagu5tmbmri" path="res://scripts/paint_collision_manager.gd" id="11_37s47"]
 [ext_resource type="PackedScene" uid="uid://dlehjsdji2u7p" path="res://scenes/pause_menu.tscn" id="12_bt5mj"]
+[ext_resource type="Texture2D" uid="uid://0ocealjsa44t" path="res://sprites/GhostGirlIdle.PNG" id="13_1kice"]
 [ext_resource type="PackedScene" uid="uid://djlv25g846rld" path="res://LanternHealthBar.tscn" id="13_kvuet"]
+[ext_resource type="Texture2D" uid="uid://2h3i26seyxxx" path="res://sprites/Brush.PNG" id="14_5newe"]
 [ext_resource type="Texture2D" uid="uid://cery77t52cff" path="res://sprites/mist.png" id="14_rysoc"]
 [ext_resource type="PackedScene" uid="uid://b70dgj1peoqt5" path="res://scenes/ink_bar.tscn" id="16_rysoc"]
 [ext_resource type="Texture2D" uid="uid://do5t7qh431jcv" path="res://sprites/lantern_glow.png" id="17_ssvqc"]
@@ -38,6 +40,28 @@ size = Vector2(13.333328, 94.54167)
 size = Vector2(64.33336, 12.666655)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6iyv3"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5newe"]
+atlas = ExtResource("13_1kice")
+region = Rect2(0, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_37s47"]
+atlas = ExtResource("13_1kice")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bt5mj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5newe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_37s47")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="Gradient" id="Gradient_ca42v"]
 offsets = PackedFloat32Array(0, 0.4074733, 0.5747331, 1)
@@ -80,7 +104,7 @@ render_target_update_mode = 4
 z_index = -20
 ink_color = Color(1, 1, 1, 1)
 ink_drain_rate = 50.0
-ink_regen_rate = 1.0
+ink_regen_rate = 3.0
 
 [node name="BrushCapture" type="BackBufferCopy" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 z_index = -10
@@ -175,7 +199,12 @@ script = ExtResource("7_ssvqc")
 shape = SubResource("CircleShape2D_6iyv3")
 
 [node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+visible = false
 texture = ExtResource("8_264po")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+sprite_frames = SubResource("SpriteFrames_bt5mj")
+frame_progress = 0.46080354
 
 [node name="HitTimerNormal" type="Timer" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 wait_time = 0.3
@@ -184,6 +213,11 @@ one_shot = true
 [node name="HitTimerSprinter" type="Timer" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 wait_time = 0.05
 one_shot = true
+
+[node name="BrushSprite" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+position = Vector2(4.7383323, 4.5383353)
+texture = ExtResource("14_5newe")
+offset = Vector2(-0.565, -2.92)
 
 [node name="Enemy" parent="CanvasLayer/SubViewportContainer/SubViewport" instance=ExtResource("10_dinhu")]
 position = Vector2(447.00003, 306.6667)
@@ -322,15 +356,8 @@ scale = Vector2(3, 3)
 texture = ExtResource("18_264po")
 
 [node name="InkBar" parent="CanvasLayer" instance=ExtResource("16_rysoc")]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -95.999756
-offset_top = -90.0
-offset_right = -95.999756
-offset_bottom = -90.0
-grow_horizontal = 0
-grow_vertical = 0
+offset_left = 6.435
+offset_top = -13.75
+offset_right = 6.435
+offset_bottom = -13.75
 scale = Vector2(3, 3)

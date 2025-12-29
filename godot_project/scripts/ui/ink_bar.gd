@@ -34,6 +34,12 @@ func _ready():
 
 
 func _process(delta):
+	# Update position to follow cursor
+	var mouse_pos = get_viewport().get_mouse_position()
+	# Position the ink bar to the right of the cursor
+	# Add offset to place it to the right (e.g., 20 pixels to the right)
+	position = mouse_pos + Vector2(20, 0)
+
 	# Always update the ink level display (unless showing warning)
 	if current_ink > max_ink * 0.1 or is_showing_splash:
 		_update_ink_level()
