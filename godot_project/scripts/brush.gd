@@ -217,7 +217,8 @@ func _process(delta: float):
 				i += 1
 
 		# enforce max point limit, remove oldest points
-		if ink_points.size() > max_ink_points:
+		# skip during ult so all strokes are kept
+		if ink_points.size() > max_ink_points and not is_ult_active:
 			var excess = ink_points.size() - max_ink_points
 			ink_points = ink_points.slice(excess)
 
