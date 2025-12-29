@@ -7,7 +7,7 @@ extends Node
 @export var max_angle: float = 15.0
 
 ## Maximum offset in pixels
-@export var max_offset: Vector2 = Vector2(100, 75)
+@export var max_offset: Vector2 = Vector2(30, 20)
 
 ## How fast trauma recovers (0-1 per second)
 @export var trauma_decay_rate: float = 1.0

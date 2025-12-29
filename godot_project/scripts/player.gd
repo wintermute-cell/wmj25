@@ -112,9 +112,9 @@ func _physics_process(delta: float):
 
 	last_position = global_position
 
-	# ult timer
+	# ult timer (use unscaled delta since Engine.time_scale affects delta)
 	if is_ult_active:
-		ult_time_remaining -= delta
+		ult_time_remaining -= delta / Engine.time_scale
 		if ult_time_remaining <= 0:
 			deactivate_ultimate()
 
@@ -126,7 +126,7 @@ func take_damage(amount: float):
 
 	var current_time = Time.get_ticks_msec() / 1000.0
 	if current_time - last_damage_shake_time >= damage_shake_cooldown:
-		CameraShake.add_trauma(0.3)
+		CameraShake.add_trauma(0.4)
 		last_damage_shake_time = current_time
 
 	if health <= 0:

@@ -181,15 +181,25 @@ func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 
 
 func crunch():
-	var points = 100 # TODO: calc based on enemy type
+	var base_points = 100 # TODO: calc based on enemy type
+
+	# Register kill and get combo multiplier
+	var combo_data = GameManager.register_kill()
+	var multiplier = combo_data.multiplier
+	var kill_count = combo_data.kill_count
+
+	# Calculate final score with multiplier
+	var final_points = int(base_points * multiplier)
 
 	# spawn crush effect
 	var effect = CRUSH_PARTICLES.instantiate()
 	effect.global_position = global_position
-	effect.score_value = points
+	effect.score_value = final_points
+	effect.multiplier = multiplier
+	effect.kill_count = kill_count
 	get_parent().add_child(effect)
 
-	GameManager.add_score(points)
+	GameManager.add_score(final_points)
 
 	GameManager.sound_enemy_died()
 
@@ -199,6 +209,6 @@ func crunch():
 		player_node.add_ult_charge(player_node.ult_charge_per_kill)
 
 	# add camera shake on death
-	CameraShake.add_trauma(0.3)
+	CameraShake.add_trauma(0.5)
 
 	queue_free()

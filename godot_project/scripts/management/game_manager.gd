@@ -10,6 +10,16 @@ var current_state: GameState = GameState.MENU
 var current_score: int = 0
 signal score_changed(new_score: int)
 
+# Combo system
+var kill_timestamps: Array[float] = []
+var combo_window: float = 2.0  ## Time window in seconds for combo kills
+var combo_tiers: Array[Dictionary] = [
+	{"min_kills": 7, "multiplier": 3.0},
+	{"min_kills": 5, "multiplier": 2.0},
+	{"min_kills": 3, "multiplier": 1.5}
+]
+signal combo_achieved(multiplier: float, kill_count: int)
+
 
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_loop_1: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -48,6 +58,7 @@ func _ready():
 
 func start_game():
 	current_score = 0
+	kill_timestamps.clear()
 	reset_music_pitch()
 	audio_start_game.play()
 	start_ingame_music()
@@ -72,6 +83,7 @@ func return_to_menu():
 
 func restart_game():
 	current_score = 0
+	kill_timestamps.clear()
 	reset_music_pitch()
 	stop_ingame_music()
 	stop_ambient_sounds()
@@ -116,6 +128,35 @@ func add_score(points: int):
 	change_music_pitch()
 	score_changed.emit(current_score)
 	start_playing_score_increase()
+
+
+## Register a kill and return the combo multiplier
+## Returns a dictionary with: {"multiplier": float, "kill_count": int}
+func register_kill() -> Dictionary:
+	var current_time = Time.get_ticks_msec() / 1000.0
+
+	# Add current kill timestamp
+	kill_timestamps.append(current_time)
+
+	# Remove timestamps outside the combo window
+	var cutoff_time = current_time - combo_window
+	kill_timestamps = kill_timestamps.filter(func(t): return t >= cutoff_time)
+
+	# Count kills in window
+	var kill_count = kill_timestamps.size()
+
+	# Determine multiplier based on kill count
+	var multiplier = 1.0
+	for tier in combo_tiers:
+		if kill_count >= tier.min_kills:
+			multiplier = tier.multiplier
+			break
+
+	# Emit combo signal if we have a multiplier
+	if multiplier > 1.0:
+		combo_achieved.emit(multiplier, kill_count)
+
+	return {"multiplier": multiplier, "kill_count": kill_count}
 
 
 #########################################################################

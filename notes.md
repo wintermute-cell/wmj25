@@ -20,3 +20,4 @@
 - web build nochmal testen
 - tutorial
 - player death behaviour
+- ult indicator via cursor outline
