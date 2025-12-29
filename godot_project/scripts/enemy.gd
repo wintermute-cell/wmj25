@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 
-enum EnemyType {BASIC, DASHER}
+enum EnemyType {BASIC, DASHER, SPRINTER}
 
 
 # preload particle effect
@@ -31,11 +31,15 @@ var dash_speed: float = 200.0
 var dasher_base_speed: float = 50.0
 var is_dashing: bool = false
 var last_direction: Vector2 = Vector2.ZERO
+var sprinter_move_away: bool = false
 
 # coll layers
 const WALL_LAYER = 1
 const PLAYER_LAYER = 2
 const ENEMY_LAYER = 3
+
+const DASHER_SPEED: float = 50.0
+const SPRINTER_SPEED: float = 200.0
 
 
 func _ready():
@@ -53,7 +57,11 @@ func _ready():
 		dash_timer.wait_time = dash_cooldown
 		dash_timer.one_shot = false
 		dash_timer.start(dash_cooldown)
-
+	# set up sprinter timers
+	$SprinterDamageTimer.timeout.connect(sprinter_damage_timer_timeout)
+	$SprinterMoveAwayTimer.timeout.connect(sprinter_move_away_timer_timeout)
+	$SprinterMoveSlowTimer.timeout.connect(sprinter_move_slow_timer_timeout)
+	
 
 	# set up player detection area
 	player_detection_area = get_node_or_null("DetectionArea")
@@ -77,16 +85,24 @@ func _process(delta: float) -> void:
 		$AnimatedSpriteBasic.play()
 	elif enemy_type == EnemyType.DASHER:
 		$AnimatedSpriteDasher.play()
+	elif enemy_type == EnemyType.SPRINTER:
+		$AnimatedSpriteSprinter.play()
 	
 
 func _physics_process(delta: float):
 	# chase player if exists
 	if player != null and is_instance_valid(player):
 		var direction: Vector2
-		if not is_dashing:
-			direction = (player.global_position - global_position).normalized()
-		else:
+		# normal behavior
+		if is_dashing:
 			direction = last_direction
+		# sprinter behaviour
+		elif enemy_type == EnemyType.SPRINTER and sprinter_move_away:
+			direction = (global_position - player.global_position).normalized()
+		# dasher behavior
+		else:
+			direction = (player.global_position - global_position).normalized()
+
 		velocity = direction * speed
 		last_direction = direction
 	else:
@@ -96,9 +112,11 @@ func _physics_process(delta: float):
 	if velocity.x < 0:
 		$AnimatedSpriteBasic.flip_h = true
 		$AnimatedSpriteDasher.flip_h = true
+		$AnimatedSpriteSprinter.flip_h = true
 	elif velocity.x >= 0:
 		$AnimatedSpriteBasic.flip_h = false
 		$AnimatedSpriteDasher.flip_h = false
+		$AnimatedSpriteSprinter.flip_h = false
 
 
 	# move with collision
@@ -112,6 +130,9 @@ func _physics_process(delta: float):
 func _on_body_entered(body: Node2D):
 	if body == player or body.is_in_group("player"):
 		is_touching_player = true
+		if enemy_type == EnemyType.SPRINTER and $SprinterDamageTimer.is_stopped() and $SprinterMoveAwayTimer.is_stopped() and $SprinterMoveSlowTimer.is_stopped() and sprinter_move_away == false:
+			print("start sprinter damage timer")
+			$SprinterDamageTimer.start()
 
 
 func _on_body_exited(body: Node2D):
@@ -131,12 +152,21 @@ func _on_new_collision_created(new_polygons: Array[PackedVector2Array]):
 func change_enemy_type(new_type: int):
 	if new_type == 1:
 		enemy_type = EnemyType.DASHER
-		speed = 50.0
+		speed = DASHER_SPEED
 		damage_per_second = 30.0
 		$AnimatedSpriteBasic.hide()
 		$AnimatedSpriteDasher.show()
+		$AnimatedSpriteSprinter.hide()
 
+	elif new_type == 2:
+		enemy_type = EnemyType.SPRINTER
+		speed = SPRINTER_SPEED
+		damage_per_second = 25.0
+		$AnimatedSpriteBasic.hide()
+		$AnimatedSpriteDasher.hide()
+		$AnimatedSpriteSprinter.show()
 
+# dash behaviour (kinda wonky)
 func dash_towards_player():
 	if player != null and is_instance_valid(player):
 		is_dashing = true
@@ -147,6 +177,18 @@ func dash_towards_player():
 		dash_timer.wait_time = dash_cooldown
 		is_dashing = false
 
+# sprinter behaviour
+func sprinter_damage_timer_timeout():
+	sprinter_move_away = true
+	$SprinterMoveAwayTimer.start()
+	print("moveing away")
+func sprinter_move_away_timer_timeout():
+	sprinter_move_away = false
+	speed = 30
+	print("moveing slow")
+	$SprinterMoveSlowTimer.start()
+func sprinter_move_slow_timer_timeout():
+	speed = SPRINTER_SPEED
 
 func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 	# get enemy's collision shape radius

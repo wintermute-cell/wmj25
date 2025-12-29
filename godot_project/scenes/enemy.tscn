@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://d257nqp3u5byv"]
+[gd_scene load_steps=16 format=3 uid="uid://d257nqp3u5byv"]
 
 [ext_resource type="Script" uid="uid://b1owqutpiap0w" path="res://scripts/enemy.gd" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://cyga5l6mm4dxm" path="res://enemy.png" id="2_4ra3w"]
 [ext_resource type="Texture2D" uid="uid://cs0e5nq21m7ke" path="res://sprites/Enemy3.PNG" id="3_4ra3w"]
 [ext_resource type="Texture2D" uid="uid://c63nsvgwdwbf4" path="res://sprites/Enemy2.PNG" id="4_5uy6h"]
+[ext_resource type="Texture2D" uid="uid://fgj7a3h3pj3n" path="res://sprites/Enemy1.PNG" id="5_c4w8v"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uhfjk"]
 
@@ -51,6 +52,28 @@ animations = [{
 "speed": 4.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ipns3"]
+atlas = ExtResource("5_c4w8v")
+region = Rect2(0, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8qclf"]
+atlas = ExtResource("5_c4w8v")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_w8i8w"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ipns3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8qclf")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
 [node name="Enemy" type="CharacterBody2D"]
 script = ExtResource("1_md0e3")
 crush_margin_multiplier = 0.1
@@ -77,3 +100,18 @@ sprite_frames = SubResource("SpriteFrames_xwavj")
 [node name="AnimatedSpriteDasher" type="AnimatedSprite2D" parent="."]
 visible = false
 sprite_frames = SubResource("SpriteFrames_ipns3")
+
+[node name="AnimatedSpriteSprinter" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_w8i8w")
+
+[node name="SprinterMoveAwayTimer" type="Timer" parent="."]
+wait_time = 0.7
+one_shot = true
+
+[node name="SprinterDamageTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="SprinterMoveSlowTimer" type="Timer" parent="."]
+one_shot = true

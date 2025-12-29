@@ -66,17 +66,25 @@ func spawn_enemy():
 		return
 
 	var enemy = enemy_scene.instantiate()
-	# change enemy type for variety (optional)
-	var enemy_type_roll: int = 0
-	if elapsed_time > 10.0:
-		enemy_type_roll = randi() % 10
+	# change enemy type for variety
+	var enemy_type_roll: int = 100 # default value to avoid changing type before time is elapsed to 30 seconds
+	if elapsed_time > 30.0:
+		enemy_type_roll = randi() % 30
 	if elapsed_time > 60.0:
-		enemy_type_roll = randi() % 8
+		enemy_type_roll = randi() % 25
 	if elapsed_time > 90.0:
-		enemy_type_roll = randi() % 6
-	
-	if enemy_type_roll == 1:
-		enemy.change_enemy_type(enemy_type_roll)
+		enemy_type_roll = randi() % 15
+
+	print("Enemy type roll: %d" % enemy_type_roll)
+
+	if enemy_type_roll < 6:
+		enemy_type_roll = 1 # DASHER
+	elif enemy_type_roll < 8:
+		enemy_type_roll = 2 # SPRINTER
+	else:
+		enemy_type_roll = 0 # BASIC
+
+	enemy.change_enemy_type(enemy_type_roll)
 
 
 	enemy.global_position = get_random_spawn_position()
