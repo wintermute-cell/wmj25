@@ -58,11 +58,12 @@ func _ready():
 		dash_timer.wait_time = dash_cooldown
 		dash_timer.one_shot = false
 		dash_timer.start(dash_cooldown)
+
 	# set up sprinter timers
 	$SprinterDamageTimer.timeout.connect(sprinter_damage_timer_timeout)
 	$SprinterMoveAwayTimer.timeout.connect(sprinter_move_away_timer_timeout)
 	$SprinterMoveSlowTimer.timeout.connect(sprinter_move_slow_timer_timeout)
-	
+	$SprinterAliveTimer.timeout.connect(sprinter_alive_timer_timeout)
 
 	# set up player detection area
 	player_detection_area = get_node_or_null("DetectionArea")
@@ -182,16 +183,20 @@ func dash_towards_player():
 	if player != null and is_instance_valid(player):
 		is_dashing = true
 		speed = DASH_SPEED
-		GameManager.start_playing_enemy_dash()
+		GameManager.play_enemy_dash()
 		await get_tree().create_timer(dash_duration).timeout
 		speed = DASHER_SPEED
 		dash_timer.wait_time = dash_cooldown
 		is_dashing = false
 
+func sprinter_alive_timer_timeout():
+	pass
+
 # sprinter behaviour
 func sprinter_damage_timer_timeout():
 	sprinter_move_away = true
 	$SprinterMoveAwayTimer.start()
+
 func sprinter_move_away_timer_timeout():
 	sprinter_move_away = false
 	speed = 30
@@ -199,6 +204,7 @@ func sprinter_move_away_timer_timeout():
 	$SprinterAliveTimer.start() # prevent immediate re-triggering
 func sprinter_move_slow_timer_timeout():
 	speed = SPRINTER_SPEED_SPRINTING
+
 
 func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 	# get enemy's collision shape radius

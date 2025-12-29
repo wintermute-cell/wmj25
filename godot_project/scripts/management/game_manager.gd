@@ -49,7 +49,6 @@ signal combo_achieved(multiplier: float, kill_count: int)
 @onready var audio_enemy_dead2: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead3: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_enemy_dead_additional: AudioStreamPlayer = AudioStreamPlayer.new()
-@onready var audio_enemy_dash: AudioStreamPlayer = AudioStreamPlayer.new()
 
 @onready var audio_ink_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_score_increase: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -57,6 +56,10 @@ signal combo_achieved(multiplier: float, kill_count: int)
 var audio_player_hit_pool: Array[AudioStreamPlayer] = []
 var current_player_hit_audio_pool_index: int = 0
 var max_player_hit_audio_pool_size: int = 20
+
+var audio_enemy_dash_pool: Array[AudioStreamPlayer] = []
+var current_enemy_dash_audio_pool_index: int = 0
+var max_enemy_dash_audio_pool_size: int = 10
 
 
 var ingame_music_position: float = 0.0
@@ -308,9 +311,8 @@ func load_audio():
 	audio_ambient_breath.bus = "Breath"
 	add_child(audio_ambient_breath)
 
-	audio_enemy_dash.stream = preload("res://audio/dash.mp3")
-	audio_enemy_dash.bus = "Dash"
-	add_child(audio_enemy_dash)
+	init_enemy_dash_audio_pool()
+
 
 	#########################################################################
 	# ingame sound effects
@@ -530,10 +532,15 @@ func start_playing_ink_pickup():
 func stop_playing_ink_pickup():
 	audio_ink_pickup.stop()
 
-func start_playing_enemy_dash():
+func play_enemy_dash():
+	var audio_enemy_dash = audio_enemy_dash_pool[current_enemy_dash_audio_pool_index]
+	var random_pitch_for_dash = 1.0 + (randf() * 0.1) - 0.05
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("Dash"), 0).set_pitch_scale(random_pitch_for_dash)
 	audio_enemy_dash.play()
-func stop_playing_enemy_dash():
-	audio_enemy_dash.stop()
+	current_enemy_dash_audio_pool_index += 1
+	if current_enemy_dash_audio_pool_index >= max_enemy_dash_audio_pool_size:
+		current_enemy_dash_audio_pool_index = 0
+
 
 func play_player_hit(enemy_type: int = 0):
 	var audio_player_hit = audio_player_hit_pool[current_player_hit_audio_pool_index]
@@ -549,9 +556,6 @@ func play_player_hit(enemy_type: int = 0):
 	if current_player_hit_audio_pool_index >= max_player_hit_audio_pool_size:
 		current_player_hit_audio_pool_index = 0
 
-# func stop_player_hit():
-# 	audio_player_hit.stop()
-
 
 func init_audio_player_hit_pool():
 	audio_player_hit_pool.clear()
@@ -561,6 +565,16 @@ func init_audio_player_hit_pool():
 		player_hit_instance.bus = "Hit"
 		add_child(player_hit_instance)
 		audio_player_hit_pool.append(player_hit_instance)
+
+func init_enemy_dash_audio_pool():
+	audio_enemy_dash_pool.clear()
+	for i in range(max_enemy_dash_audio_pool_size):
+		var enemy_dash_instance = AudioStreamPlayer.new()
+		enemy_dash_instance.stream = preload("res://audio/dash.mp3")
+		enemy_dash_instance.bus = "Dash"
+		add_child(enemy_dash_instance)
+		audio_enemy_dash_pool.append(enemy_dash_instance)
+
 
 func play_scroll_out():
 	audio_scroll_out.play()

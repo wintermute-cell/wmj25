@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=8 format=3 uid="uid://wr18634x15h7"]
+[gd_resource type="AudioBusLayout" load_steps=10 format=3 uid="uid://wr18634x15h7"]
 
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_5t1r3"]
 resource_name = "PitchShift"
@@ -9,7 +9,13 @@ resource_name = "HighPassFilter"
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_n8wo2"]
 resource_name = "PitchShift"
 
+[sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_7kkex"]
+resource_name = "PitchShift"
+
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_j3pel"]
+resource_name = "PitchShift"
+
+[sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_dqt2m"]
 resource_name = "PitchShift"
 
 [sub_resource type="AudioEffectPitchShift" id="AudioEffectPitchShift_cenje"]
@@ -155,6 +161,8 @@ bus/20/mute = false
 bus/20/bypass_fx = false
 bus/20/volume_db = -8.798218
 bus/20/send = &"SoundeffectsSlider"
+bus/20/effect/0/effect = SubResource("AudioEffectPitchShift_7kkex")
+bus/20/effect/0/enabled = true
 bus/21/name = &"Hit"
 bus/21/solo = false
 bus/21/mute = false
@@ -169,3 +177,11 @@ bus/22/mute = false
 bus/22/bypass_fx = false
 bus/22/volume_db = -4.504105
 bus/22/send = &"SoundeffectsSlider"
+bus/23/name = &"Sprint"
+bus/23/solo = false
+bus/23/mute = false
+bus/23/bypass_fx = false
+bus/23/volume_db = -4.504105
+bus/23/send = &"SoundeffectsSlider"
+bus/23/effect/0/effect = SubResource("AudioEffectPitchShift_dqt2m")
+bus/23/effect/0/enabled = true
