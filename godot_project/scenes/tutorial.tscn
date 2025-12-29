@@ -1,12 +1,50 @@
-[gd_scene load_steps=5 format=3 uid="uid://bosfvg2el4bpk"]
+[gd_scene load_steps=12 format=3 uid="uid://bosfvg2el4bpk"]
 
-[ext_resource type="Shader" uid="uid://b4hphormbj8bj" path="res://shaders/tutorial_reveal.gdshader" id="1_8ho6b"]
-[ext_resource type="Script" uid="uid://dkts0ccayurmg" path="res://scripts/ui/tutorial.gd" id="1_ph3nu"]
+[ext_resource type="Shader" path="res://shaders/tutorial_reveal.gdshader" id="1_8ho6b"]
+[ext_resource type="Script" path="res://scripts/ui/tutorial.gd" id="1_ph3nu"]
 [ext_resource type="Texture2D" uid="uid://cocwf4svsmbfl" path="res://sprites/tutorial.png" id="2_ph3nu"]
+[ext_resource type="Texture2D" uid="uid://bxbcpcpwio5fj" path="res://sprites/ghost_swinging.png" id="4_4kmhl"]
+[ext_resource type="Texture2D" uid="uid://bgqberq7n6bor" path="res://sprites/tutorial_ult.png" id="5_cq4me"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4kmhl"]
 shader = ExtResource("1_8ho6b")
-shader_parameter/reveal_percent = 0.166000007885
+shader_parameter/reveal_percent = 1.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cq4me"]
+atlas = ExtResource("4_4kmhl")
+region = Rect2(0, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6yjpi"]
+atlas = ExtResource("4_4kmhl")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gbqnl"]
+atlas = ExtResource("4_4kmhl")
+region = Rect2(48, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ckvwl"]
+atlas = ExtResource("4_4kmhl")
+region = Rect2(72, 0, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nlqja"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cq4me")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6yjpi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gbqnl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckvwl")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="Tutorial" type="Control"]
 process_mode = 3
@@ -46,3 +84,14 @@ material = SubResource("ShaderMaterial_4kmhl")
 layout_mode = 2
 texture = ExtResource("2_ph3nu")
 stretch_mode = 5
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CenterContainer/TutorialSprite"]
+position = Vector2(458, 150.66666)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_nlqja")
+frame_progress = 0.22479287
+
+[node name="Sprite2D" type="Sprite2D" parent="CenterContainer/TutorialSprite"]
+position = Vector2(148.33333, 196.00003)
+scale = Vector2(0.333, 0.333)
+texture = ExtResource("5_cq4me")

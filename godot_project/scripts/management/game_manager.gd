@@ -14,6 +14,18 @@ signal score_changed(new_score: int)
 # tutorial state, resets on page reload
 var tutorial_shown: bool = false
 
+# custom cursor system
+var cursor_canvas_layer: CanvasLayer
+var cursor_sprite: Sprite2D
+var cursor_texture: Texture2D = preload("res://sprites/cursor.png")
+const CURSOR_COLS: int = 11
+const CURSOR_ROWS: int = 2
+var cursor_frame_size: Vector2
+var cursor_anim_timer: float = 0.0
+const CURSOR_ANIM_SPEED: float = 0.15 # sec per frame
+var cursor_current_row: int = 0
+var current_ult_charge_percent: float = 0.0
+
 # combo system
 var kill_timestamps: Array[float] = []
 var combo_window: float = 0.6 ## Time window in seconds for combo kills
@@ -67,7 +79,11 @@ var ingame_music_position: float = 0.0
 
 
 func _ready():
+	# always process even during pause so cursor updates
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	load_audio()
+	setup_cursor()
 	# ensure we start in the correct state
 	if get_tree().current_scene:
 		var scene_path = get_tree().current_scene.scene_file_path
@@ -76,6 +92,18 @@ func _ready():
 
 
 func _process(delta: float):
+	# update cursor anim
+	if cursor_sprite:
+		cursor_anim_timer += delta
+		if cursor_anim_timer >= CURSOR_ANIM_SPEED:
+			cursor_anim_timer = 0.0
+			cursor_current_row = 1 - cursor_current_row # toggle between 0 and 1
+			update_cursor_frame()
+
+		# follow mouse, offset by hotspot so it aligns correctly
+		var mouse_pos = get_viewport().get_mouse_position()
+		cursor_sprite.global_position = mouse_pos - Vector2(2, 2)
+
 	# check if burst has ended and show combo popup for highest tier
 	if burst_active:
 		burst_timer += delta
@@ -101,6 +129,7 @@ func start_game():
 	burst_timer = 0.0
 	burst_active = false
 	reset_music_pitch()
+	set_ult_charge_percent(0.0)
 	audio_start_game.play()
 	start_ingame_music()
 	start_ambient_sounds()
@@ -116,6 +145,7 @@ func return_to_menu():
 	stop_ingame_music()
 	stop_ambient_sounds()
 	reset_music_pitch()
+	set_ult_charge_percent(0.0)
 
 	# stop the current scene from processing immediately
 	var current_scene = get_tree().current_scene
@@ -357,6 +387,61 @@ func load_audio():
 	audio_brush_stroke_single.stream = preload("res://audio/strokesingle.mp3")
 	audio_brush_stroke_single.bus = "Brushstrokes"
 	add_child(audio_brush_stroke_single)
+
+
+func setup_cursor():
+	# hide default cursor
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+
+	# calc frame size from texture
+	cursor_frame_size = Vector2(
+		cursor_texture.get_width() / float(CURSOR_COLS),
+		cursor_texture.get_height() / float(CURSOR_ROWS)
+	)
+
+	# create canvas layer for cursor so it renders on top
+	cursor_canvas_layer = CanvasLayer.new()
+	cursor_canvas_layer.layer = 1000 # always on top
+	cursor_canvas_layer.process_mode = Node.PROCESS_MODE_ALWAYS # continue during pause
+	add_child(cursor_canvas_layer)
+
+	# create sprite for custom cursor
+	cursor_sprite = Sprite2D.new()
+	cursor_sprite.texture = cursor_texture
+	cursor_sprite.centered = false
+
+	# use region to show only one frame
+	cursor_sprite.region_enabled = true
+	cursor_sprite.region_rect = Rect2(Vector2.ZERO, cursor_frame_size)
+
+	# add to canvas layer so it persists across scenes
+	cursor_canvas_layer.add_child(cursor_sprite)
+
+	# init with 0 charge
+	update_cursor_frame(0.0)
+
+
+func update_cursor_frame(charge_percent: float = -1.0):
+	if not cursor_sprite:
+		return
+
+	# use stored charge if not provided
+	if charge_percent < 0.0:
+		charge_percent = current_ult_charge_percent
+
+	# map charge to column, first col used until 10%
+	var column = int(charge_percent / 10.0)
+	column = clamp(column, 0, CURSOR_COLS - 1)
+
+	# calc region rect for current frame
+	var region_x = column * cursor_frame_size.x
+	var region_y = cursor_current_row * cursor_frame_size.y
+	cursor_sprite.region_rect = Rect2(Vector2(region_x, region_y), cursor_frame_size)
+
+
+func set_ult_charge_percent(percent: float):
+	current_ult_charge_percent = percent
+	update_cursor_frame(percent)
 
 
 func set_music_volume(volume: float):

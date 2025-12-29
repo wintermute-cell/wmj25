@@ -10,8 +10,8 @@ extends Node2D
 @onready var background: Sprite2D = $CanvasLayer/SubViewportContainer/SubViewport/Background
 @onready var camera: Camera2D = $CanvasLayer/SubViewportContainer/SubViewport/Camera2D
 
-var ghost_texture: Texture2D = preload("res://test_360p_bg_ghost.png")
-var normal_texture: Texture2D = preload("res://test_360p_bg_normal.png")
+# var ghost_texture: Texture2D = preload("res://test_360p_bg_ghost.png")
+# var normal_texture: Texture2D = preload("res://test_360p_bg_normal.png")
 
 
 func _ready():
@@ -22,6 +22,7 @@ func _ready():
 
 	if player:
 		player.health_changed.connect(_on_health_changed)
+		player.ult_charge_changed.connect(_on_ult_charge_changed)
 
 	if brush:
 		brush.ink_changed.connect(_on_ink_changed)
@@ -33,6 +34,9 @@ func _ready():
 		ink_pickup_spawner.reset()
 
 	setup_background_shader()
+
+	# reset cursor to 0 charge for new game
+	GameManager.set_ult_charge_percent(0.0)
 
 	# connect camera to shake system
 	if camera:
@@ -69,8 +73,8 @@ func setup_background_shader():
 		push_error("Background sprite needs a ShaderMaterial with the reveal shader!")
 		return
 
-	shader_material.set_shader_parameter("ghost_texture", normal_texture)
-	shader_material.set_shader_parameter("normal_texture", ghost_texture)
+	# shader_material.set_shader_parameter("ghost_texture", normal_texture)
+	# shader_material.set_shader_parameter("normal_texture", ghost_texture)
 
 	print("Background reveal shader configured successfully")
 
@@ -87,6 +91,11 @@ func _on_health_changed(current_health: float, max_health: float):
 func _on_ink_changed(current_ink: float, max_ink: float):
 	if ink_bar and ink_bar.has_method("update_ink"):
 		ink_bar.update_ink(current_ink, max_ink)
+
+
+func _on_ult_charge_changed(current_charge: float, max_charge: float):
+	var charge_percent = (current_charge / max_charge) * 100.0
+	GameManager.set_ult_charge_percent(charge_percent)
 
 
 func _on_combo_achieved(multiplier: float, kill_count: int):

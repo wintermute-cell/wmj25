@@ -199,8 +199,8 @@ func _process(delta: float):
 		current_ink = min(current_ink + ink_regen_rate * delta, max_ink)
 		ink_changed.emit(current_ink, max_ink)
 
-	# drain ink when drawing (skip during ult)
-	if is_drawing and current_ink > 0 and not is_ult_active:
+	# drain ink when drawing
+	if is_drawing and current_ink > 0:
 		current_ink = max(current_ink - ink_drain_rate * delta, 0.0)
 		ink_changed.emit(current_ink, max_ink)
 
@@ -256,8 +256,8 @@ func _input(event: InputEvent):
 
 	elif event is InputEventMouseMotion:
 		if is_drawing:
-			# stop if out of ink mid-stroke (unless ult)
-			if current_ink <= 0 and not is_ult_active:
+			# stop if out of ink mid-stroke
+			if current_ink <= 0:
 				is_drawing = false
 				GameManager.stop_playing_brush_stroke()
 				return

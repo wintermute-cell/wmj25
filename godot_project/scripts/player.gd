@@ -34,7 +34,8 @@ var last_position: Vector2
 var ult_charge: float = 0.0
 var is_ult_active: bool = false
 var ult_time_remaining: float = 0.0
-var e_key_was_pressed: bool = false # for edge detection
+var ult_was_pressed: bool = false # for edge detection
+var ult_charge_blocked_until: float = 0.0 # prevent charge gain after ult ends
 
 const DUST_TRAIL = preload("res://scenes/dust_trail.tscn")
 
@@ -79,14 +80,14 @@ func _process(delta: float):
 
 
 func _physics_process(delta: float):
-	# ult activation, E key
-	var e_key_is_pressed = Input.is_physical_key_pressed(KEY_E)
-	if e_key_is_pressed and not e_key_was_pressed:
+	# ult activation, right mouse
+	var ult_is_pressed = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	if ult_is_pressed and not ult_was_pressed:
 		if is_ult_active:
 			deactivate_ultimate()
 		elif ult_charge >= max_ult_charge:
 			activate_ultimate()
-	e_key_was_pressed = e_key_is_pressed
+	ult_was_pressed = ult_is_pressed
 
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 
@@ -187,6 +188,11 @@ func spawn_dust_particle():
 
 
 func add_ult_charge(amount: float):
+	# block charge gain briefly after ult ends
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time < ult_charge_blocked_until:
+		return
+
 	ult_charge = min(ult_charge + amount, max_ult_charge)
 	ult_charge_changed.emit(ult_charge, max_ult_charge)
 
@@ -212,6 +218,10 @@ func deactivate_ultimate():
 
 	is_ult_active = false
 	ult_time_remaining = 0.0
+
+	# block charge gain for short time after ult ends
+	var current_time = Time.get_ticks_msec() / 1000.0
+	ult_charge_blocked_until = current_time + 0.5 # 500ms cooldown
 
 	Engine.time_scale = 1.0
 	ult_deactivated.emit() # triggers final crush

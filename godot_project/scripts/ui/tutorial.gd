@@ -5,6 +5,8 @@ extends Control
 
 @onready var tutorial_sprite: TextureRect = $CenterContainer/TutorialSprite
 @onready var shader_material: ShaderMaterial = tutorial_sprite.material
+@onready var animated_sprite: AnimatedSprite2D = $CenterContainer/TutorialSprite/AnimatedSprite2D
+@onready var static_sprite: Sprite2D = $CenterContainer/TutorialSprite/Sprite2D
 
 var is_unrolling: bool = false
 var can_dismiss: bool = false # prevent immediate dismissal from menu click
@@ -18,6 +20,16 @@ func _ready():
 		shader_material.set_shader_parameter("reveal_percent", initial_reveal_percent)
 	else:
 		print("WARNING: No shader material on tutorial sprite!")
+
+	# make animated sprite continue during pause
+	if animated_sprite:
+		animated_sprite.process_mode = Node.PROCESS_MODE_ALWAYS
+		animated_sprite.play()
+		animated_sprite.visible = false # start hidden
+
+	# start static sprite hidden
+	if static_sprite:
+		static_sprite.visible = false
 
 	# pause the game
 	get_tree().paused = true
@@ -66,6 +78,14 @@ func unroll_scroll():
 func set_reveal_percent(percent: float):
 	if shader_material:
 		shader_material.set_shader_parameter("reveal_percent", percent)
+
+	# show static sprite at 0.25 reveal
+	if static_sprite:
+		static_sprite.visible = percent >= 0.25
+
+	# show animated sprite at 0.728 reveal
+	if animated_sprite:
+		animated_sprite.visible = percent >= 0.728
 
 
 func dismiss():
