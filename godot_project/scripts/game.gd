@@ -16,7 +16,8 @@ var normal_texture: Texture2D = preload("res://test_360p_bg_normal.png")
 
 func _ready():
 	GameManager.score_changed.connect(_on_score_changed)
-	# initialize display at start
+	GameManager.combo_achieved.connect(_on_combo_achieved)
+	# init display at start
 	_on_score_changed(GameManager.current_score)
 
 	if player:
@@ -33,13 +34,28 @@ func _ready():
 
 	setup_background_shader()
 
-	# Connect camera to shake system
+	# connect camera to shake system
 	if camera:
 		CameraShake.set_camera(camera)
 
+	# show tutorial on first game after fade in completes
+	if not GameManager.tutorial_shown:
+		await TransitionLayer.transition_finished
+		show_tutorial()
+
+
+func show_tutorial():
+	print("show_tutorial called")
+	var tutorial_scene = preload("res://scenes/tutorial.tscn")
+	var tutorial_instance = tutorial_scene.instantiate()
+	print("Tutorial instance created: ", tutorial_instance)
+	# add to canvas layer so it appears on top
+	$CanvasLayer.add_child(tutorial_instance)
+	print("Tutorial added to scene tree")
+
 
 func _exit_tree():
-	# Clean up camera reference when scene exits
+	# cleanup camera ref when scene exits
 	CameraShake.clear_camera()
 
 
@@ -71,3 +87,38 @@ func _on_health_changed(current_health: float, max_health: float):
 func _on_ink_changed(current_ink: float, max_ink: float):
 	if ink_bar and ink_bar.has_method("update_ink"):
 		ink_bar.update_ink(current_ink, max_ink)
+
+
+func _on_combo_achieved(multiplier: float, kill_count: int):
+	# create large combo popup at center of viewport
+	var combo_label = Label.new()
+	combo_label.text = "COMBO x%.1f" % multiplier
+	combo_label.z_index = 100
+
+	# pos at center of viewport
+	var viewport_size = get_viewport_rect().size
+	combo_label.position = Vector2(viewport_size.x / 2 - 100, viewport_size.y / 2 - 50)
+
+	# style the combo label (large and prominent)
+	combo_label.add_theme_font_size_override("font_size", 48)
+	combo_label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.0))  # gold
+	combo_label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0))
+	combo_label.add_theme_constant_override("outline_size", 8)
+
+	# add to canvas layer so it appears on top
+	$CanvasLayer.add_child(combo_label)
+
+	# animate the label
+	var tween = create_tween()
+	tween.set_parallel(true)
+
+	# scale pulse effect
+	combo_label.scale = Vector2(0.5, 0.5)
+	tween.tween_property(combo_label, "scale", Vector2(1.5, 1.5), 0.2)
+	tween.tween_property(combo_label, "scale", Vector2(1.0, 1.0), 0.3).set_delay(0.2)
+
+	# fade out
+	tween.tween_property(combo_label, "modulate:a", 0.0, 0.5).set_delay(0.8)
+
+	# cleanup
+	tween.finished.connect(func(): combo_label.queue_free())

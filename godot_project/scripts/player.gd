@@ -64,7 +64,7 @@ func _ready():
 	# set player z_index so it renders on top of dust particles
 	z_index = 1
 
-	# initialize position tracking for dust particles
+	# init pos tracking for dust particles
 	last_position = global_position
 
 
@@ -91,7 +91,7 @@ func _physics_process(delta: float):
 
 	move_and_slide()
 
-	# check if player would is out of bounds, and clamp position
+	# check if player is out of bounds and clamp pos
 	var viewport_rect = get_viewport_rect()
 	var player_size_half = get_node("Sprite2D").texture.get_size() / 2
 	position.x = clamp(
@@ -112,7 +112,7 @@ func _physics_process(delta: float):
 
 	last_position = global_position
 
-	# ult timer (use unscaled delta since Engine.time_scale affects delta)
+	# ult timer (use unscaled delta since Engine time_scale affects delta)
 	if is_ult_active:
 		ult_time_remaining -= delta / Engine.time_scale
 		if ult_time_remaining <= 0:
@@ -142,17 +142,17 @@ func die():
 		is_ult_active = false
 
 	print("Player died!")
-	# TODO: impl death behavior (particle, game over, etc..)
+	# TODO: impl death behavior (particle, game over, etc)
 	queue_free()
 
 
 func spawn_dust_particle():
 	var dust = DUST_TRAIL.instantiate()
 	dust.global_position = global_position
-	dust.z_index = 0 # render at default layer (player is at z_index 1)
-	# add to parent so it stays in the world and doesn't follow player
+	dust.z_index = 0  # render at default layer (player is at z_index 1)
+	# add to parent so it stays in world and doesn't follow player
 	get_parent().add_child(dust)
-	# trigger one-shot particle emission
+	# trigger one shot particle emission
 	var particles = dust.get_node("Particles")
 	if particles:
 		particles.emitting = true

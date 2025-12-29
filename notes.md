@@ -14,7 +14,7 @@
     <!-- - progression? one level getting fastester or multiple levels -->
 - celeste like hair for character
 - boss?
-- ultimate ability?
+<!-- - ultimate ability? -->
 - balancing!!
 - manuell testen ob fun ist und nicht irgendwann breaked!
 - web build nochmal testen

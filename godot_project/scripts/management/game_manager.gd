@@ -10,14 +10,23 @@ var current_state: GameState = GameState.MENU
 var current_score: int = 0
 signal score_changed(new_score: int)
 
+# tutorial state (resets on page reload)
+var tutorial_shown: bool = false
+
 # Combo system
 var kill_timestamps: Array[float] = []
-var combo_window: float = 2.0 ## Time window in seconds for combo kills
+var combo_window: float = 0.6  ## Time window in seconds for combo kills
 var combo_tiers: Array[Dictionary] = [
 	{"min_kills": 7, "multiplier": 3.0},
 	{"min_kills": 5, "multiplier": 2.0},
 	{"min_kills": 3, "multiplier": 1.5}
 ]
+var current_combo_tier: int = -1  ## Current combo tier
+var last_kill_time: float = -999.0  ## Time of last kill
+var burst_window: float = 0.15  ## Kills within this window are part of same burst
+var highest_tier_in_burst: int = -1  ## Highest tier reached during current burst
+var burst_timer: float = 0.0  ## Time since last kill in burst
+var burst_active: bool = false  ## Whether we're currently in a kill burst
 signal combo_achieved(multiplier: float, kill_count: int)
 
 
@@ -60,9 +69,31 @@ func _ready():
 			current_state = GameState.PLAYING
 
 
+func _process(delta: float):
+	# Check if burst has ended and show combo popup for highest tier
+	if burst_active:
+		burst_timer += delta
+		# If enough time has passed since last kill, burst has ended
+		if burst_timer >= burst_window:
+			if highest_tier_in_burst != -1:
+				# Show combo popup for the highest tier reached in the burst
+				var tier_data = combo_tiers[highest_tier_in_burst]
+				var multiplier = tier_data.multiplier
+				var min_kills = tier_data.min_kills
+				combo_achieved.emit(multiplier, min_kills)
+			# Reset burst
+			burst_active = false
+			highest_tier_in_burst = -1
+
+
 func start_game():
 	current_score = 0
 	kill_timestamps.clear()
+	current_combo_tier = -1
+	last_kill_time = -999.0
+	highest_tier_in_burst = -1
+	burst_timer = 0.0
+	burst_active = false
 	reset_music_pitch()
 	audio_start_game.play()
 	start_ingame_music()
@@ -88,6 +119,11 @@ func return_to_menu():
 func restart_game():
 	current_score = 0
 	kill_timestamps.clear()
+	current_combo_tier = -1
+	last_kill_time = -999.0
+	highest_tier_in_burst = -1
+	burst_timer = 0.0
+	burst_active = false
 	reset_music_pitch()
 	stop_ingame_music()
 	stop_ambient_sounds()
@@ -135,7 +171,7 @@ func add_score(points: int):
 
 
 ## Register a kill and return the combo multiplier
-## Returns a dictionary with: {"multiplier": float, "kill_count": int}
+## Returns a dictionary with: {"multiplier": float, "kill_count": int, "show_combo": bool}
 func register_kill() -> Dictionary:
 	var current_time = Time.get_ticks_msec() / 1000.0
 
@@ -144,23 +180,63 @@ func register_kill() -> Dictionary:
 
 	# Remove timestamps outside the combo window
 	var cutoff_time = current_time - combo_window
+	var old_size = kill_timestamps.size()
 	kill_timestamps = kill_timestamps.filter(func(t): return t >= cutoff_time)
+
+	# Reset combo tier if timestamps were cleaned up (combo expired)
+	if kill_timestamps.size() < old_size:
+		current_combo_tier = -1
+		highest_tier_in_burst = -1
+		burst_active = false
 
 	# Count kills in window
 	var kill_count = kill_timestamps.size()
 
-	# Determine multiplier based on kill count
+	# Determine multiplier and tier index based on kill count
 	var multiplier = 1.0
-	for tier in combo_tiers:
-		if kill_count >= tier.min_kills:
-			multiplier = tier.multiplier
+	var new_tier = -1
+	for tier_index in range(combo_tiers.size()):
+		if kill_count >= combo_tiers[tier_index].min_kills:
+			multiplier = combo_tiers[tier_index].multiplier
+			new_tier = tier_index
 			break
 
-	# Emit combo signal if we have a multiplier
-	if multiplier > 1.0:
-		combo_achieved.emit(multiplier, kill_count)
+	# Check if this kill is part of a burst (happened soon after last kill)
+	var time_since_last_kill = current_time - last_kill_time
+	var is_burst = time_since_last_kill < burst_window
 
-	return {"multiplier": multiplier, "kill_count": kill_count}
+	last_kill_time = current_time
+
+	# Update current tier
+	if new_tier != -1:
+		current_combo_tier = new_tier
+	else:
+		current_combo_tier = -1
+
+	# Track burst and highest tier in burst
+	var show_combo = false
+	if new_tier != -1:
+		if is_burst:
+			# Part of existing burst - track highest tier
+			burst_active = true
+			burst_timer = 0.0
+			if new_tier < highest_tier_in_burst or highest_tier_in_burst == -1:
+				highest_tier_in_burst = new_tier
+		else:
+			# New burst starting - show popup for highest tier from previous burst if any
+			if burst_active and highest_tier_in_burst != -1:
+				# Previous burst ended, but don't show popup here (will be shown in _process)
+				pass
+			# Start new burst
+			burst_active = true
+			burst_timer = 0.0
+			highest_tier_in_burst = new_tier
+	else:
+		# No combo, reset burst
+		burst_active = false
+		highest_tier_in_burst = -1
+
+	return {"multiplier": multiplier, "kill_count": kill_count, "show_combo": show_combo}
 
 
 #########################################################################

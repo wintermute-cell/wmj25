@@ -52,8 +52,8 @@ func _create_lanterns():
 
 	# create each lantern
 	for i in range(lantern_count):
-		# position calculation with hanging arc
-		var t = float(i) / float(lantern_count - 1) if lantern_count > 1 else 0.5  # normalized position 0-1
+		# pos calc with hanging arc
+		var t = float(i) / float(lantern_count - 1) if lantern_count > 1 else 0.5  # normalized pos 0-1
 		var x_pos = start_x + i * lantern_spacing
 
 		# parabolic: highest at edges (0 and 1), lowest in middle (0.5)
@@ -64,7 +64,7 @@ func _create_lanterns():
 			var glow = Sprite2D.new()
 			glow.texture = glow_texture
 			glow.position = Vector2(x_pos, y_offset)
-			# Start invisible, will be set by update_health
+			# start invisible, will be set by update_health
 			glow.modulate = Color(1.0, 1.0, 1.0, 0.0)
 			glow.scale = Vector2(glow_scale, glow_scale)
 			glow.z_index = 10  # in front of everything

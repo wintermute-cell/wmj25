@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://bosfvg2el4bpk"]
+
+[ext_resource type="Shader" uid="uid://b4hphormbj8bj" path="res://shaders/tutorial_reveal.gdshader" id="1_8ho6b"]
+[ext_resource type="Script" uid="uid://dkts0ccayurmg" path="res://scripts/ui/tutorial.gd" id="1_ph3nu"]
+[ext_resource type="Texture2D" uid="uid://cocwf4svsmbfl" path="res://sprites/tutorial.png" id="2_ph3nu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4kmhl"]
+shader = ExtResource("1_8ho6b")
+shader_parameter/reveal_percent = 0.166000007885
+
+[node name="Tutorial" type="Control"]
+process_mode = 3
+z_index = 500
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ph3nu")
+initial_reveal_percent = 0.166
+unroll_duration = 0.5
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6117647)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1280.0
+offset_bottom = -720.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(3, 3)
+
+[node name="TutorialSprite" type="TextureRect" parent="CenterContainer"]
+material = SubResource("ShaderMaterial_4kmhl")
+layout_mode = 2
+texture = ExtResource("2_ph3nu")
+stretch_mode = 5

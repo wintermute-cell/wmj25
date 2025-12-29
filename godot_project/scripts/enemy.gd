@@ -236,17 +236,15 @@ func crunch():
 	# Register kill and get combo multiplier
 	var combo_data = GameManager.register_kill()
 	var multiplier = combo_data.multiplier
-	var kill_count = combo_data.kill_count
 
 	# Calculate final score with multiplier
 	var final_points = int(base_points * multiplier)
 
-	# spawn crush effect
+	# spawn crush effect (score only, no combo text)
 	var effect = CRUSH_PARTICLES.instantiate()
 	effect.global_position = global_position
 	effect.score_value = final_points
-	effect.multiplier = multiplier
-	effect.kill_count = kill_count
+	effect.multiplier = 1.0  # Don't show combo text on individual enemies
 	get_parent().add_child(effect)
 
 	GameManager.add_score(final_points)
