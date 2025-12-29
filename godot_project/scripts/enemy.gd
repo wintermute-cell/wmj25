@@ -27,8 +27,6 @@ var is_touching_player: bool = false
 @onready var dash_timer: Timer = $DashTimer
 var dash_cooldown: float = 5.0
 var dash_duration: float = 0.5
-var dash_speed: float = 200.0
-var dasher_base_speed: float = 50.0
 var is_dashing: bool = false
 var last_direction: Vector2 = Vector2.ZERO
 var sprinter_move_away: bool = false
@@ -39,7 +37,10 @@ const PLAYER_LAYER = 2
 const ENEMY_LAYER = 3
 
 const DASHER_SPEED: float = 50.0
-const SPRINTER_SPEED: float = 200.0
+const DASH_SPEED: float = 200.0
+
+const SPRINTER_SPEED_NORMAL: float = 80.0
+const SPRINTER_SPEED_SPRINTING: float = 200.0
 
 
 func _ready():
@@ -119,6 +120,17 @@ func _physics_process(delta: float):
 		$AnimatedSpriteSprinter.flip_h = false
 
 
+	var distanc_to_player: float = 100000.0 # arbitrary large value
+	# sprinter speed adjustment
+	if player != null and is_instance_valid(player):
+		distanc_to_player = player.global_position.distance_to(global_position)
+	if enemy_type == EnemyType.SPRINTER:
+		if distanc_to_player < 200 && $SprinterAliveTimer.is_stopped():
+			speed = SPRINTER_SPEED_SPRINTING
+		else:
+			speed = SPRINTER_SPEED_NORMAL
+
+
 	# move with collision
 	move_and_slide()
 
@@ -160,7 +172,7 @@ func change_enemy_type(new_type: int):
 
 	elif new_type == 2:
 		enemy_type = EnemyType.SPRINTER
-		speed = SPRINTER_SPEED
+		speed = SPRINTER_SPEED_SPRINTING
 		damage_per_second = 25.0
 		$AnimatedSpriteBasic.hide()
 		$AnimatedSpriteDasher.hide()
@@ -170,10 +182,10 @@ func change_enemy_type(new_type: int):
 func dash_towards_player():
 	if player != null and is_instance_valid(player):
 		is_dashing = true
-		speed = dash_speed
+		speed = DASH_SPEED
 		GameManager.start_playing_enemy_dash()
 		await get_tree().create_timer(dash_duration).timeout
-		speed = dasher_base_speed
+		speed = DASHER_SPEED
 		dash_timer.wait_time = dash_cooldown
 		is_dashing = false
 
@@ -188,7 +200,7 @@ func sprinter_move_away_timer_timeout():
 	print("moveing slow")
 	$SprinterMoveSlowTimer.start()
 func sprinter_move_slow_timer_timeout():
-	speed = SPRINTER_SPEED
+	speed = SPRINTER_SPEED_SPRINTING
 
 func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:
 	# get enemy's collision shape radius
@@ -244,7 +256,7 @@ func crunch():
 	var effect = CRUSH_PARTICLES.instantiate()
 	effect.global_position = global_position
 	effect.score_value = final_points
-	effect.multiplier = 1.0  # Don't show combo text on individual enemies
+	effect.multiplier = 1.0 # Don't show combo text on individual enemies
 	get_parent().add_child(effect)
 
 	GameManager.add_score(final_points)
