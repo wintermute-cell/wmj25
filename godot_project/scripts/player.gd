@@ -28,13 +28,13 @@ extends CharacterBody2D
 @export var max_ult_charge: float = 100.0
 
 var health: float = 100.0
-var last_damage_shake_time: float = -999.0  # Track last shake time
+var last_damage_shake_time: float = -999.0 # Track last shake time
 var distance_since_last_dust: float = 0.0
 var last_position: Vector2
 var ult_charge: float = 0.0
 var is_ult_active: bool = false
 var ult_time_remaining: float = 0.0
-var e_key_was_pressed: bool = false  # for edge detection
+var e_key_was_pressed: bool = false # for edge detection
 
 const DUST_TRAIL = preload("res://scenes/dust_trail.tscn")
 
@@ -49,8 +49,8 @@ const PLAYER_LAYER = 2
 
 
 func _ready():
-	collision_layer = 1 << (PLAYER_LAYER - 1)  # L2
-	collision_mask = 1 << (WALL_LAYER - 1)  # coll with walls (L1)
+	collision_layer = 1 << (PLAYER_LAYER - 1) # L2
+	collision_mask = 1 << (WALL_LAYER - 1) # coll with walls (L1)
 
 	health = max_health
 	health_changed.emit(health, max_health)
@@ -120,8 +120,9 @@ func _physics_process(delta: float):
 
 
 func take_damage(amount: float):
+	GameManager.play_player_hit()
 	health -= amount
-	health = max(health, 0.0)  # clamp to 0
+	health = max(health, 0.0) # clamp to 0
 	health_changed.emit(health, max_health)
 
 	var current_time = Time.get_ticks_msec() / 1000.0
@@ -148,7 +149,7 @@ func die():
 func spawn_dust_particle():
 	var dust = DUST_TRAIL.instantiate()
 	dust.global_position = global_position
-	dust.z_index = 0  # render at default layer (player is at z_index 1)
+	dust.z_index = 0 # render at default layer (player is at z_index 1)
 	# add to parent so it stays in the world and doesn't follow player
 	get_parent().add_child(dust)
 	# trigger one-shot particle emission
@@ -185,7 +186,7 @@ func deactivate_ultimate():
 	ult_time_remaining = 0.0
 
 	Engine.time_scale = 1.0
-	ult_deactivated.emit()  # triggers final crush
+	ult_deactivated.emit() # triggers final crush
 
 	print("Ultimate deactivated!")
 

@@ -43,6 +43,10 @@ signal combo_achieved(multiplier: float, kill_count: int)
 @onready var audio_ink_pickup: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_score_increase: AudioStreamPlayer = AudioStreamPlayer.new()
 
+var audio_player_hit_pool: Array[AudioStreamPlayer] = []
+var current_player_hit_audio_pool_index: int = 0
+var max_player_hit_audio_pool_size: int = 20
+
 
 var ingame_music_position: float = 0.0
 
@@ -209,6 +213,8 @@ func load_audio():
 	audio_player_dead.stream = preload("res://audio/dead.mp3")
 	audio_player_dead.bus = "SoundeffectsSlider"
 	add_child(audio_player_dead)
+
+	init_audio_player_hit_pool()
 
 	audio_enemy_dead2.stream = preload("res://audio/breaking2.mp3")
 	audio_enemy_dead2.bus = "Breaking"
@@ -424,3 +430,26 @@ func start_playing_enemy_dash():
 	audio_enemy_dash.play()
 func stop_playing_enemy_dash():
 	audio_enemy_dash.stop()
+
+func play_player_hit():
+	var audio_player_hit = audio_player_hit_pool[current_player_hit_audio_pool_index]
+	# pitch shift randomly
+	var random_pitch_for_hit = 1.0 + (randf() * 0.4) - 0.1
+	AudioServer.get_bus_effect(AudioServer.get_bus_index("Hit"), 0).set_pitch_scale(random_pitch_for_hit)
+	audio_player_hit.play()
+	current_player_hit_audio_pool_index += 1
+	if current_player_hit_audio_pool_index >= max_player_hit_audio_pool_size:
+		current_player_hit_audio_pool_index = 0
+
+# func stop_player_hit():
+# 	audio_player_hit.stop()
+
+
+func init_audio_player_hit_pool():
+	audio_player_hit_pool.clear()
+	for i in range(max_player_hit_audio_pool_size):
+		var player_hit_instance = AudioStreamPlayer.new()
+		player_hit_instance.stream = preload("res://audio/hit.mp3")
+		player_hit_instance.bus = "Hit"
+		add_child(player_hit_instance)
+		audio_player_hit_pool.append(player_hit_instance)
