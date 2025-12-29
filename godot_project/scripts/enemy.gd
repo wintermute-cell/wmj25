@@ -71,6 +71,14 @@ func _ready():
 		player = get_tree().get_first_node_in_group("player")
 
 
+func _process(delta: float) -> void:
+	# animation
+	if enemy_type == EnemyType.BASIC:
+		$AnimatedSpriteBasic.play()
+	elif enemy_type == EnemyType.DASHER:
+		$AnimatedSpriteDasher.play()
+	
+
 func _physics_process(delta: float):
 	# chase player if exists
 	if player != null and is_instance_valid(player):
@@ -117,6 +125,8 @@ func change_enemy_type(new_type: int):
 		speed = 50.0
 		damage_per_second = 30.0
 		scale = Vector2.ONE * 2.0
+		$AnimatedSpriteBasic.hide()
+		$AnimatedSpriteDasher.show()
 
 
 func dash_towards_player():

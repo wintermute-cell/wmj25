@@ -68,7 +68,7 @@ func spawn_enemy():
 	var enemy = enemy_scene.instantiate()
 	# change enemy type for variety (optional)
 	var enemy_type_roll: int = 0
-	if elapsed_time > 30.0:
+	if elapsed_time > 10.0:
 		enemy_type_roll = randi() % 10
 	if elapsed_time > 60.0:
 		enemy_type_roll = randi() % 8

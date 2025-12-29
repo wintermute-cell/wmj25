@@ -1,9 +1,55 @@
-[gd_scene load_steps=4 format=3 uid="uid://d257nqp3u5byv"]
+[gd_scene load_steps=12 format=3 uid="uid://d257nqp3u5byv"]
 
 [ext_resource type="Script" uid="uid://b1owqutpiap0w" path="res://scripts/enemy.gd" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://cyga5l6mm4dxm" path="res://enemy.png" id="2_4ra3w"]
+[ext_resource type="Texture2D" uid="uid://cs0e5nq21m7ke" path="res://sprites/Enemy3.PNG" id="3_4ra3w"]
+[ext_resource type="Texture2D" uid="uid://c63nsvgwdwbf4" path="res://sprites/Enemy2.PNG" id="4_5uy6h"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uhfjk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c4w8v"]
+atlas = ExtResource("3_4ra3w")
+region = Rect2(0, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xwavj"]
+atlas = ExtResource("3_4ra3w")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xwavj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c4w8v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xwavj")
+}],
+"loop": true,
+"name": &"default",
+"speed": 6.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nenq2"]
+atlas = ExtResource("4_5uy6h")
+region = Rect2(0, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_md484"]
+atlas = ExtResource("4_5uy6h")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ipns3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nenq2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_md484")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}]
 
 [node name="Enemy" type="CharacterBody2D"]
 script = ExtResource("1_md0e3")
@@ -20,6 +66,14 @@ collision_mask = 10
 shape = SubResource("CircleShape2D_uhfjk")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
 texture = ExtResource("2_4ra3w")
 
 [node name="DashTimer" type="Timer" parent="."]
+
+[node name="AnimatedSpriteBasic" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xwavj")
+
+[node name="AnimatedSpriteDasher" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_ipns3")
