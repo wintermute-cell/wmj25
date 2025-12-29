@@ -19,7 +19,7 @@ Sounds:
 - dead https://pixabay.com/sound-effects/taiko-drum-367656/
 - noodles https://pixabay.com/sound-effects/man-eating-teriyaki-noodles-33320/
 
-- dash https://pixabay.com/sound-effects/swoosh-2-359826/
+- dash https://pixabay.com/sound-effects/punch-2-166695/
 - brush1 https://pixabay.com/sound-effects/cleaning-a-coat-with-a-brush-77187/
 - brush2 https://pixabay.com/sound-effects/sweeping-38385/
 - wet1 https://pixabay.com/sound-effects/wet-squishy-sound-34303/

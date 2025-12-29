@@ -12,7 +12,7 @@ signal score_changed(new_score: int)
 
 # Combo system
 var kill_timestamps: Array[float] = []
-var combo_window: float = 2.0  ## Time window in seconds for combo kills
+var combo_window: float = 2.0 ## Time window in seconds for combo kills
 var combo_tiers: Array[Dictionary] = [
 	{"min_kills": 7, "multiplier": 3.0},
 	{"min_kills": 5, "multiplier": 2.0},
@@ -201,7 +201,7 @@ func load_audio():
 	add_child(audio_ambient_breath)
 
 	audio_enemy_dash.stream = preload("res://audio/dash.mp3")
-	audio_enemy_dash.bus = "SoundeffectsSlider"
+	audio_enemy_dash.bus = "Dash"
 	add_child(audio_enemy_dash)
 
 	#########################################################################
