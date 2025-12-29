@@ -1,9 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://c4iqyuwnpr7rg"]
+[gd_scene load_steps=6 format=3 uid="uid://c4iqyuwnpr7rg"]
 
 [ext_resource type="Script" uid="uid://b0f1l0od3hvce" path="res://scripts/ui/main_menu.gd" id="1_l6cm7"]
+[ext_resource type="Theme" uid="uid://c4dx0j1vhsn3" path="res://themes/button_theme.tres" id="2_button"]
+[ext_resource type="Texture2D" uid="uid://di635uhnhhgm7" path="res://sprites/mainmenu.png" id="3_bqqt6"]
+[ext_resource type="Texture2D" uid="uid://00borbfon7ak" path="res://sprites/title.png" id="4_wu84c"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_vue75"]
 font_size = 51
+outline_size = 20
+outline_color = Color(0, 0, 0, 1)
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -12,7 +17,18 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_button")
 script = ExtResource("1_l6cm7")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 420.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_bqqt6")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -21,13 +37,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.3769629, 0.26525548, 0.53690803, 1)
+color = Color(0, 0, 0, 0.3647059)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -586.5
+offset_top = -116.5
+offset_right = 586.5
+offset_bottom = 116.5
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -35,20 +57,29 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="GameTitle" type="Label" parent="CenterContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
-text = "Game Name goes heree!!!"
+text = "SHINESUMI!"
 label_settings = SubResource("LabelSettings_vue75")
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("4_wu84c")
 
 [node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 
 [node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
+custom_minimum_size = Vector2(150, 60)
 layout_mode = 2
 text = "Start Game"
 
+[node name="Spacer2" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 11.23)
+layout_mode = 2
+
 [node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
+custom_minimum_size = Vector2(150, 60)
 layout_mode = 2
 text = "Quit Game"
