@@ -1,5 +1,5 @@
-- music
-- sfx
+<!-- - music -->
+<!-- - sfx -->
 <!-- - loadscreen nice machen -->
 - game implementation
     <!-- - paint stroke drawing -->
@@ -10,7 +10,7 @@
 - game design details
     <!-- - moving walls -->
     <!-- - coming up with good level design in terms of wall placements -->
-    - enemy ai, enemy variants
+    <!-- - enemy ai, enemy variants -->
     <!-- - progression? one level getting fastester or multiple levels -->
 <!-- - celeste like hair for character -->
 - boss?
@@ -19,6 +19,6 @@
 - manuell testen ob fun ist und nicht irgendwann breaked!
 - web build nochmal testen
 <!-- - tutorial -->
-- player death behaviour
-- ult indicator via cursor outline
-- screenshake on restart broken
+<!-- - player death behaviour -->
+<!-- - ult indicator via cursor outline -->
+<!-- - screenshake on restart broken -->

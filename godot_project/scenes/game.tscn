@@ -327,6 +327,7 @@ shape = SubResource("RectangleShape2D_gxtfn")
 [node name="Player" type="CharacterBody2D" parent="CanvasLayer/SubViewportContainer/SubViewport" groups=["player"]]
 position = Vector2(81.595, 66.795)
 script = ExtResource("7_ssvqc")
+ult_charge_per_kill = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 shape = SubResource("CircleShape2D_6iyv3")
