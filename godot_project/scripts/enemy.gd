@@ -6,6 +6,7 @@ enum EnemyType {BASIC, DASHER, SPRINTER}
 
 # preload particle effect
 const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
+const DUST_TRAIL = preload("res://scenes/enemy_dust_trail.tscn")
 
 ## speed in px/second
 @export var speed: float = 75.0
@@ -15,6 +16,9 @@ const CRUSH_PARTICLES = preload("res://enemy_crush_particles.tscn")
 
 ## crush margin as a percentage of collision radius (0.3 = 30% extra range)
 @export_range(0.0, 2.0, 0.1) var crush_margin_multiplier: float = 0.3
+
+## distance enemy must move before spawning next dust particle
+@export var dust_spawn_distance: float = 50.0
 
 ## ref to player node (autofound if not set)
 @export var player: CharacterBody2D
@@ -30,6 +34,10 @@ var dash_duration: float = 0.5
 var is_dashing: bool = false
 var last_direction: Vector2 = Vector2.ZERO
 var sprinter_move_away: bool = false
+
+# dust trail tracking
+var distance_since_last_dust: float = 0.0
+var last_position: Vector2
 
 # coll layers
 const WALL_LAYER = 1
@@ -78,6 +86,9 @@ func _ready():
 
 	# always find player, refresh in case of scene reload
 	player = get_tree().get_first_node_in_group("player")
+
+	# init pos tracking for dust particles
+	last_position = global_position
 
 
 func _process(delta: float) -> void:
@@ -133,6 +144,17 @@ func _physics_process(delta: float):
 
 	# move with collision
 	move_and_slide()
+
+	# spawn dust trail particles when moving
+	if velocity.length() > 0:
+		var distance_moved = global_position.distance_to(last_position)
+		distance_since_last_dust += distance_moved
+
+		if distance_since_last_dust >= dust_spawn_distance:
+			spawn_dust_particle()
+			distance_since_last_dust = 0.0
+
+	last_position = global_position
 
 	# dmg player if touching
 	if is_touching_player and player != null and player.has_method("take_damage"):
@@ -204,6 +226,18 @@ func sprinter_move_away_timer_timeout():
 	$SprinterAliveTimer.start() # prevent immediate re-triggering
 func sprinter_move_slow_timer_timeout():
 	speed = SPRINTER_SPEED_SPRINTING
+
+
+func spawn_dust_particle():
+	var dust = DUST_TRAIL.instantiate()
+	dust.global_position = global_position
+	dust.z_index = 0  # render at default layer behind enemies
+	# add to parent so it stays in world and doesn't follow enemy
+	get_parent().add_child(dust)
+	# trigger one shot particle emission
+	var particles = dust.get_node("Particles")
+	if particles:
+		particles.emitting = true
 
 
 func does_enemy_overlap_polygon(polygon: PackedVector2Array) -> bool:

@@ -75,6 +75,7 @@ animations = [{
 }]
 
 [node name="Enemy" type="CharacterBody2D"]
+z_index = 1
 script = ExtResource("1_md0e3")
 crush_margin_multiplier = 0.1
 

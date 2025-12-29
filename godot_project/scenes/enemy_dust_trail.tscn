@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://bkrp8xpwx4x2v"]
+
+[ext_resource type="Texture2D" uid="uid://cvd0f4aqrglrx" path="res://brush_config/brush.png" id="1_jna7n"]
+[ext_resource type="Script" uid="uid://d13kag4a4kn2c" path="res://scripts/dust_trail.gd" id="1_y7e63"]
+
+[sub_resource type="Curve" id="Curve_y7e63"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.6963815), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_enemy_alpha"]
+colors = PackedColorArray(0.63, 0.63, 0.63, 0.3137255, 0.33, 0.33, 0.33, 0)
+
+[sub_resource type="Gradient" id="Gradient_rnvfl"]
+colors = PackedColorArray(0.46, 0.46, 0.46, 1, 1, 1, 1, 1)
+
+[node name="EnemyDustTrail" type="Node2D"]
+script = ExtResource("1_y7e63")
+
+[node name="Particles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 3
+texture = ExtResource("1_jna7n")
+one_shot = true
+explosiveness = 0.91
+spread = 180.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+angular_velocity_min = -21.95
+angular_velocity_max = 21.95
+radial_accel_min = -42.08
+radial_accel_max = 27.43
+scale_amount_min = 0.1
+scale_amount_max = 0.2
+scale_amount_curve = SubResource("Curve_y7e63")
+color_ramp = SubResource("Gradient_enemy_alpha")
+color_initial_ramp = SubResource("Gradient_rnvfl")
