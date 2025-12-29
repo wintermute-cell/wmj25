@@ -113,7 +113,7 @@ func _physics_process(delta: float):
 	var viewport_rect = get_viewport_rect()
 	var sprite_node = get_node_or_null("AnimatedSprite2D")
 	if sprite_node and sprite_node.sprite_frames:
-		var player_size_half = Vector2(24, 24) / 2  # 24x24 sprite
+		var player_size_half = Vector2(24, 24) / 2 # 24x24 sprite
 		position.x = clamp(
 			position.x, 0 + player_size_half.x, viewport_rect.size.x - player_size_half.x
 		)
@@ -169,15 +169,15 @@ func die():
 		Engine.time_scale = 1.0
 		is_ult_active = false
 
-	print("Player died!")
 	# todo impl death behavior
 	queue_free()
+	GameManager.game_over()
 
 
 func spawn_dust_particle():
 	var dust = DUST_TRAIL.instantiate()
 	dust.global_position = global_position
-	dust.z_index = 0  # render at default layer
+	dust.z_index = 0 # render at default layer
 	# add to parent so it stays in world and doesn't follow player
 	get_parent().add_child(dust)
 	# trigger one shot particle emission

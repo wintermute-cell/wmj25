@@ -3,8 +3,9 @@ extends Node
 
 const MAIN_MENU_PATH = "res://scenes/main_menu.tscn"
 const GAME_PATH = "res://scenes/game.tscn"
+const GAME_OVER_PATH = "res://scenes/game_over.tscn"
 
-enum GameState {MENU, PLAYING, PAUSED, LOADING}
+enum GameState {MENU, PLAYING, PAUSED, LOADING, GAME_OVER}
 var current_state: GameState = GameState.MENU
 
 var current_score: int = 0
@@ -185,6 +186,14 @@ func resume_game():
 		current_state = GameState.PLAYING
 		get_tree().paused = false
 
+func game_over():
+	pause_ingame_music()
+	stop_ambient_sounds()
+	reset_music_pitch()
+	current_state = GameState.GAME_OVER
+	SceneLoader.load_scene(GAME_OVER_PATH)
+	
+	
 
 func add_score(points: int):
 	current_score += points
