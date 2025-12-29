@@ -507,10 +507,14 @@ func start_playing_enemy_dash():
 func stop_playing_enemy_dash():
 	audio_enemy_dash.stop()
 
-func play_player_hit():
+func play_player_hit(enemy_type: int = 0):
 	var audio_player_hit = audio_player_hit_pool[current_player_hit_audio_pool_index]
 	# pitch shift randomly
-	var random_pitch_for_hit = 1.0 + (randf() * 0.4) - 0.1
+	var random_pitch_for_hit
+	if enemy_type == 2:
+		random_pitch_for_hit = 1.0 + (randf() * 0.2) + 0.7
+	else:
+		random_pitch_for_hit = 1.0 + (randf() * 0.4) - 0.1
 	AudioServer.get_bus_effect(AudioServer.get_bus_index("Hit"), 0).set_pitch_scale(random_pitch_for_hit)
 	audio_player_hit.play()
 	current_player_hit_audio_pool_index += 1

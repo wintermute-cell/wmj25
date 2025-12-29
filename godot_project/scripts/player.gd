@@ -119,8 +119,16 @@ func _physics_process(delta: float):
 			deactivate_ultimate()
 
 
-func take_damage(amount: float):
-	GameManager.play_player_hit()
+func take_damage(amount: float, enemy_type: int = 0):
+	if enemy_type == 2: # dasher sound
+		if $HitTimerSprinter.is_stopped():
+			GameManager.play_player_hit(enemy_type)
+			$HitTimerSprinter.start()
+	else: # normal hit sound
+		if $HitTimerNormal.is_stopped():
+			GameManager.play_player_hit()
+			$HitTimerNormal.start()
+		
 	health -= amount
 	health = max(health, 0.0) # clamp to 0
 	health_changed.emit(health, max_health)

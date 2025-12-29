@@ -124,7 +124,7 @@ func _physics_process(delta: float):
 
 	# dmg player if touching
 	if is_touching_player and player != null and player.has_method("take_damage"):
-		player.take_damage(damage_per_second * delta)
+		player.take_damage(damage_per_second * delta, enemy_type)
 
 
 func _on_body_entered(body: Node2D):

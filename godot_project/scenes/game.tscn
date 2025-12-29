@@ -177,6 +177,14 @@ shape = SubResource("CircleShape2D_6iyv3")
 [node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
 texture = ExtResource("8_264po")
 
+[node name="HitTimerNormal" type="Timer" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+wait_time = 0.3
+one_shot = true
+
+[node name="HitTimerSprinter" type="Timer" parent="CanvasLayer/SubViewportContainer/SubViewport/Player"]
+wait_time = 0.05
+one_shot = true
+
 [node name="Enemy" parent="CanvasLayer/SubViewportContainer/SubViewport" instance=ExtResource("10_dinhu")]
 position = Vector2(447.00003, 306.6667)
 

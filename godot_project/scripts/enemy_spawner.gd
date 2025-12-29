@@ -75,7 +75,6 @@ func spawn_enemy():
 	if elapsed_time > 90.0:
 		enemy_type_roll = randi() % 15
 
-	print("Enemy type roll: %d" % enemy_type_roll)
 
 	if enemy_type_roll < 6:
 		enemy_type_roll = 1 # DASHER
