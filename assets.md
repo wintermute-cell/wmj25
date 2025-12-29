@@ -32,3 +32,5 @@ Sounds:
 - breaking1 https://pixabay.com/sound-effects/bone-break-sound-ver-2-269660/
 - breaking2 https://pixabay.com/sound-effects/bone-snap-408148/
 - breaking3 https://pixabay.com/sound-effects/bone-break-8-218516/
+- scrollout https://pixabay.com/sound-effects/paper-66648/
+- scrollin https://pixabay.com/sound-effects/paper-66648/

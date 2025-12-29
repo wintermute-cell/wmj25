@@ -15,20 +15,22 @@ var tutorial_shown: bool = false
 
 # Combo system
 var kill_timestamps: Array[float] = []
-var combo_window: float = 0.6  ## Time window in seconds for combo kills
+var combo_window: float = 0.6 ## Time window in seconds for combo kills
 var combo_tiers: Array[Dictionary] = [
 	{"min_kills": 7, "multiplier": 3.0},
 	{"min_kills": 5, "multiplier": 2.0},
 	{"min_kills": 3, "multiplier": 1.5}
 ]
-var current_combo_tier: int = -1  ## Current combo tier
-var last_kill_time: float = -999.0  ## Time of last kill
-var burst_window: float = 0.15  ## Kills within this window are part of same burst
-var highest_tier_in_burst: int = -1  ## Highest tier reached during current burst
-var burst_timer: float = 0.0  ## Time since last kill in burst
-var burst_active: bool = false  ## Whether we're currently in a kill burst
+var current_combo_tier: int = -1 ## Current combo tier
+var last_kill_time: float = -999.0 ## Time of last kill
+var burst_window: float = 0.15 ## Kills within this window are part of same burst
+var highest_tier_in_burst: int = -1 ## Highest tier reached during current burst
+var burst_timer: float = 0.0 ## Time since last kill in burst
+var burst_active: bool = false ## Whether we're currently in a kill burst
 signal combo_achieved(multiplier: float, kill_count: int)
 
+@onready var audio_scroll_out: AudioStreamPlayer = AudioStreamPlayer.new()
+@onready var audio_scroll_in: AudioStreamPlayer = AudioStreamPlayer.new()
 
 @onready var audio_ingame_music: AudioStreamPlayer = AudioStreamPlayer.new()
 @onready var audio_ambient_loop_1: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -245,6 +247,14 @@ func register_kill() -> Dictionary:
 func load_audio():
 	set_music_volume(0.5)
 	set_soundeffects_volume(0.5)
+
+	# scroll sounds
+	audio_scroll_out.stream = preload("res://audio/scrollout.mp3")
+	audio_scroll_out.bus = "Scroll"
+	add_child(audio_scroll_out)
+	audio_scroll_in.stream = preload("res://audio/scrollin.mp3")
+	audio_scroll_in.bus = "Scroll"
+	add_child(audio_scroll_in)
 
 	audio_start_game.stream = preload("res://audio/newgame.mp3")
 	audio_start_game.bus = "SoundeffectsSlider"
@@ -533,3 +543,9 @@ func init_audio_player_hit_pool():
 		player_hit_instance.bus = "Hit"
 		add_child(player_hit_instance)
 		audio_player_hit_pool.append(player_hit_instance)
+
+func play_scroll_out():
+	audio_scroll_out.play()
+
+func play_scroll_in():
+	audio_scroll_in.play()

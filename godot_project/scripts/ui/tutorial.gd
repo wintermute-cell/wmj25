@@ -1,13 +1,13 @@
 extends Control
 
-@export_range(0.0, 1.0) var initial_reveal_percent: float = 0.2  # how much visible at start
-@export var unroll_duration: float = 0.8  # how long to unroll
+@export_range(0.0, 1.0) var initial_reveal_percent: float = 0.2 # how much visible at start
+@export var unroll_duration: float = 0.8 # how long to unroll
 
 @onready var tutorial_sprite: TextureRect = $CenterContainer/TutorialSprite
 @onready var shader_material: ShaderMaterial = tutorial_sprite.material
 
 var is_unrolling: bool = false
-var can_dismiss: bool = false  # prevent immediate dismissal from menu click
+var can_dismiss: bool = false # prevent immediate dismissal from menu click
 
 
 func _ready():
@@ -42,6 +42,7 @@ func _input(event):
 
 
 func unroll_scroll():
+	GameManager.play_scroll_out()
 	is_unrolling = true
 
 	if not shader_material:
@@ -52,7 +53,7 @@ func unroll_scroll():
 
 	# animate from initial percent to 100%
 	var tween = create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)  # continue during pause
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) # continue during pause
 	tween.tween_method(
 		set_reveal_percent,
 		initial_reveal_percent,
@@ -85,13 +86,14 @@ func dismiss():
 func roll_back():
 	if not shader_material:
 		return
+	GameManager.play_scroll_in()
 
 	# get current reveal percent
 	var current_percent = shader_material.get_shader_parameter("reveal_percent")
 
 	# animate back to initial percent
 	var tween = create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)  # continue during pause
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) # continue during pause
 	tween.tween_method(
 		set_reveal_percent,
 		current_percent,
