@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dn3ral11lw7nj"]
+[gd_scene load_steps=27 format=3 uid="uid://dn3ral11lw7nj"]
 
 [ext_resource type="Script" uid="uid://bn2t2h2bqedir" path="res://scripts/game.gd" id="1_kvuet"]
 [ext_resource type="Script" uid="uid://bepm072l20xet" path="res://scripts/enemy_spawner.gd" id="2_trtic"]
@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://cery77t52cff" path="res://sprites/mist.png" id="14_rysoc"]
 [ext_resource type="PackedScene" uid="uid://b70dgj1peoqt5" path="res://scenes/ink_bar.tscn" id="16_rysoc"]
 [ext_resource type="Texture2D" uid="uid://do5t7qh431jcv" path="res://sprites/lantern_glow.png" id="17_ssvqc"]
+[ext_resource type="Texture2D" uid="uid://bxsln323lkk4g" path="res://sprites/ink_cup_full.png" id="18_264po"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kvuet"]
 shader = ExtResource("5_kvpfn")
@@ -307,4 +308,21 @@ glow_alpha = 0.1
 glow_scale = 1.4
 glow_flicker_amount = 0.02
 
+[node name="InkCupBackground" type="Sprite2D" parent="CanvasLayer"]
+position = Vector2(1863, 1032)
+scale = Vector2(3, 3)
+texture = ExtResource("18_264po")
+
 [node name="InkBar" parent="CanvasLayer" instance=ExtResource("16_rysoc")]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -95.999756
+offset_top = -90.0
+offset_right = -95.999756
+offset_bottom = -90.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(3, 3)
