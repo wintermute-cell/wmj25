@@ -192,12 +192,11 @@ func dash_towards_player():
 func sprinter_damage_timer_timeout():
 	sprinter_move_away = true
 	$SprinterMoveAwayTimer.start()
-	print("moveing away")
 func sprinter_move_away_timer_timeout():
 	sprinter_move_away = false
 	speed = 30
-	print("moveing slow")
 	$SprinterMoveSlowTimer.start()
+	$SprinterAliveTimer.start() # prevent immediate re-triggering
 func sprinter_move_slow_timer_timeout():
 	speed = SPRINTER_SPEED_SPRINTING
 
