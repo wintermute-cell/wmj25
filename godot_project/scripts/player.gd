@@ -18,14 +18,30 @@ extends CharacterBody2D
 ## Distance player must move before spawning next dust particle
 @export var dust_spawn_distance: float = 50.0
 
+## Ultimate ability duration in seconds
+@export var ult_duration: float = 5.0
+
+## Ult charge gained per enemy kill
+@export var ult_charge_per_kill: float = 20.0
+
+## Maximum ult charge
+@export var max_ult_charge: float = 100.0
+
 var health: float = 100.0
 var last_damage_shake_time: float = -999.0  # Track last shake time
 var distance_since_last_dust: float = 0.0
 var last_position: Vector2
+var ult_charge: float = 0.0
+var is_ult_active: bool = false
+var ult_time_remaining: float = 0.0
+var e_key_was_pressed: bool = false  # for edge detection
 
 const DUST_TRAIL = preload("res://scenes/dust_trail.tscn")
 
 signal health_changed(current_health: float, max_health: float)
+signal ult_charge_changed(current_charge: float, max_charge: float)
+signal ult_activated()
+signal ult_deactivated()
 
 # coll layers
 const WALL_LAYER = 1
@@ -39,6 +55,9 @@ func _ready():
 	health = max_health
 	health_changed.emit(health, max_health)
 
+	ult_charge = 0.0
+	ult_charge_changed.emit(ult_charge, max_ult_charge)
+
 	# player group for enemy targeting
 	add_to_group("player")
 
@@ -50,6 +69,15 @@ func _ready():
 
 
 func _physics_process(delta: float):
+	# ult activation (E key)
+	var e_key_is_pressed = Input.is_physical_key_pressed(KEY_E)
+	if e_key_is_pressed and not e_key_was_pressed:
+		if is_ult_active:
+			deactivate_ultimate()
+		elif ult_charge >= max_ult_charge:
+			activate_ultimate()
+	e_key_was_pressed = e_key_is_pressed
+
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 
 	var is_painting = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
@@ -84,6 +112,12 @@ func _physics_process(delta: float):
 
 	last_position = global_position
 
+	# ult timer
+	if is_ult_active:
+		ult_time_remaining -= delta
+		if ult_time_remaining <= 0:
+			deactivate_ultimate()
+
 
 func take_damage(amount: float):
 	health -= amount
@@ -101,6 +135,11 @@ func take_damage(amount: float):
 
 
 func die():
+	# cleanup ult if active
+	if is_ult_active:
+		Engine.time_scale = 1.0
+		is_ult_active = false
+
 	print("Player died!")
 	# TODO: impl death behavior (particle, game over, etc..)
 	queue_free()
@@ -116,3 +155,42 @@ func spawn_dust_particle():
 	var particles = dust.get_node("Particles")
 	if particles:
 		particles.emitting = true
+
+
+func add_ult_charge(amount: float):
+	ult_charge = min(ult_charge + amount, max_ult_charge)
+	ult_charge_changed.emit(ult_charge, max_ult_charge)
+
+
+func activate_ultimate():
+	if is_ult_active or ult_charge < max_ult_charge:
+		return
+
+	is_ult_active = true
+	ult_charge = 0.0
+	ult_time_remaining = ult_duration
+	ult_charge_changed.emit(ult_charge, max_ult_charge)
+
+	Engine.time_scale = 0.1
+	ult_activated.emit()
+
+	print("Ultimate activated! Duration: %.1f seconds" % ult_duration)
+
+
+func deactivate_ultimate():
+	if not is_ult_active:
+		return
+
+	is_ult_active = false
+	ult_time_remaining = 0.0
+
+	Engine.time_scale = 1.0
+	ult_deactivated.emit()  # triggers final crush
+
+	print("Ultimate deactivated!")
+
+
+func _exit_tree():
+	# cleanup time scale on scene exit
+	if is_ult_active:
+		Engine.time_scale = 1.0

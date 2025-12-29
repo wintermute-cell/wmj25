@@ -141,6 +141,7 @@ var accumulated_distance: float = 0.0
 var cleanup_timer: float = 0.0 # timer for periodic cleanup
 var smoothed_size: float = 0.0 # smoothed brush size to prevent rapid changes
 var current_ink: float = 100.0 # current ink level
+var is_ult_active: bool = false
 
 
 func _ready():
@@ -168,6 +169,12 @@ func _ready():
 		speed_to_pool_curve = Curve.new()
 		speed_to_pool_curve.add_point(Vector2(0.0, 0.0))
 
+	# connect to player ult signals
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		player.ult_activated.connect(_on_ult_activated)
+		player.ult_deactivated.connect(_on_ult_deactivated)
+
 
 func _process(delta: float):
 	current_time += delta
@@ -178,8 +185,8 @@ func _process(delta: float):
 		current_ink = min(current_ink + ink_regen_rate * delta, max_ink)
 		ink_changed.emit(current_ink, max_ink)
 
-	# drain ink when drawing
-	if is_drawing and current_ink > 0:
+	# drain ink when drawing (skip during ult)
+	if is_drawing and current_ink > 0 and not is_ult_active:
 		current_ink = max(current_ink - ink_drain_rate * delta, 0.0)
 		ink_changed.emit(current_ink, max_ink)
 
@@ -230,8 +237,8 @@ func _input(event: InputEvent):
 
 	elif event is InputEventMouseMotion:
 		if is_drawing:
-			# stop drawing if we run out of ink mid-stroke
-			if current_ink <= 0:
+			# stop if out of ink mid-stroke (unless ult)
+			if current_ink <= 0 and not is_ult_active:
 				is_drawing = false
 				GameManager.stop_playing_brush_stroke()
 				return
@@ -285,7 +292,8 @@ func add_ink_splatter(
 	if is_stroke_start:
 		# initial touch is small and controlled
 		final_size = brush_min_size
-		var point = InkPoint.new(pos, final_size, current_time, main_stroke_lifetime, true)
+		var lifetime = 999999.0 if is_ult_active else main_stroke_lifetime
+		var point = InkPoint.new(pos, final_size, current_time, lifetime, true)
 		ink_points.append(point)
 		return
 
@@ -295,7 +303,8 @@ func add_ink_splatter(
 		if speed < lift_slow_threshold:
 			# slow lift = more pooling/blob as pen lingers
 			var lift_size = base_size * lift_size_multiplier
-			var point = InkPoint.new(pos, lift_size, current_time, main_stroke_lifetime, true)
+			var lifetime = 999999.0 if is_ult_active else main_stroke_lifetime
+			var point = InkPoint.new(pos, lift_size, current_time, lifetime, true)
 			ink_points.append(point)
 			# add a small pool that scales with brush size
 			var pool_spread = base_size * lift_pool_spread
@@ -304,23 +313,26 @@ func add_ink_splatter(
 					randf_range(-pool_spread, pool_spread), randf_range(-pool_spread, pool_spread)
 				)
 				var rot = randf() * TAU if rotate_splotches else 0.0
+				var pool_lifetime = 999999.0 if is_ult_active else detail_lifetime
 				var pool = InkPoint.new(
 					pos + offset,
 					lift_size * randf_range(0.7, 1.0),
 					current_time,
-					detail_lifetime,
+					pool_lifetime,
 					false,
 					rot
 				)
 				ink_points.append(pool)
 		else:
 			# fast lift = clean, minimal extra ink
-			var point = InkPoint.new(pos, final_size, current_time, main_stroke_lifetime, true)
+			var lifetime = 999999.0 if is_ult_active else main_stroke_lifetime
+			var point = InkPoint.new(pos, final_size, current_time, lifetime, true)
 			ink_points.append(point)
 		return
 
 	# add main point
-	var point = InkPoint.new(pos, final_size, current_time, main_stroke_lifetime, true)
+	var lifetime = 999999.0 if is_ult_active else main_stroke_lifetime
+	var point = InkPoint.new(pos, final_size, current_time, lifetime, true)
 	ink_points.append(point)
 
 	# splotching: use curve to determine probability based on speed
@@ -347,8 +359,9 @@ func add_ink_splatter(
 			)
 			var splotch_size = final_size * randf_range(splotch_size_min, splotch_size_max)
 			var rot = randf() * TAU if rotate_splotches else 0.0
+			var splotch_lifetime = 999999.0 if is_ult_active else detail_lifetime
 			var splotch = InkPoint.new(
-				pos + offset, splotch_size, current_time, detail_lifetime, false, rot
+				pos + offset, splotch_size, current_time, splotch_lifetime, false, rot
 			)
 			ink_points.append(splotch)
 
@@ -377,8 +390,9 @@ func add_ink_splatter(
 			)
 			var pool_size = final_size * randf_range(pool_size_min, pool_size_max)
 			var rot = randf() * TAU if rotate_splotches else 0.0
+			var pool_lifetime = 999999.0 if is_ult_active else detail_lifetime
 			var pool = InkPoint.new(
-				pos + pool_offset, pool_size, current_time, detail_lifetime, false, rot
+				pos + pool_offset, pool_size, current_time, pool_lifetime, false, rot
 			)
 			ink_points.append(pool)
 
@@ -453,3 +467,22 @@ func _draw():
 func add_ink(amount: float):
 	current_ink = min(current_ink + amount, max_ink)
 	ink_changed.emit(current_ink, max_ink)
+
+
+func _on_ult_activated():
+	is_ult_active = true
+	current_ink = max_ink
+	ink_changed.emit(current_ink, max_ink)
+
+
+func _on_ult_deactivated():
+	is_ult_active = false
+
+	# reset infinite-lifetime ink to start fading from now
+	for point in ink_points:
+		if point.max_lifetime >= 999999.0:
+			point.creation_time = current_time
+			if point.is_main_stroke:
+				point.max_lifetime = main_stroke_lifetime
+			else:
+				point.max_lifetime = detail_lifetime

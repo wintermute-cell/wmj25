@@ -33,6 +33,10 @@ var last_ink_point_count: int = 0
 # wall polys extracted from scene
 var walls: Array[PackedVector2Array] = []
 
+# ult state
+var is_ult_active: bool = false
+var player_ref: CharacterBody2D = null
+
 # coll layer for paint-masked walls
 const WALL_LAYER = 1
 
@@ -47,6 +51,12 @@ func _ready():
 	extract_walls_from_scene(search_root)
 
 	print("PaintCollisionManager init with %d walls" % walls.size())
+
+	# connect to player ult signals
+	player_ref = get_tree().get_first_node_in_group("player")
+	if player_ref:
+		player_ref.ult_activated.connect(_on_ult_activated)
+		player_ref.ult_deactivated.connect(_on_ult_deactivated)
 
 
 func _process(delta: float):
@@ -177,7 +187,10 @@ func update_collision_geometry():
 			# create collision shapes for each intersection polygon
 			for intersection_poly in intersections:
 				if intersection_poly.size() >= 3:  # Valid polygon
-					create_collision_for_polygon(intersection_poly, active_body_count)
+					# skip coll creation during ult
+					if not is_ult_active:
+						create_collision_for_polygon(intersection_poly, active_body_count)
+
 					new_collision_areas.append(
 						{
 							"polygon": intersection_poly,
@@ -326,6 +339,10 @@ func clear_all_collisions():
 
 
 func check_crunches(new_areas: Array[Dictionary]):
+	# skip crunch detection during ult
+	if is_ult_active:
+		return
+
 	# compare new collision areas with previous ones
 	# if a new area appears, check if any enemies are inside it
 
@@ -357,6 +374,62 @@ func hash_polygon(polygon: PackedVector2Array) -> int:
 		hash_value = hash_value ^ (x * 73856093)
 		hash_value = hash_value ^ (y * 19349663)
 	return hash_value
+
+
+func crush_all_enemies_under_paint():
+	if not "ink_points" in brush or not "current_time" in brush:
+		return
+
+	var ink_points = brush.ink_points
+	var current_time = brush.current_time
+
+	# build paint circles from all ink
+	var paint_circles: Array[Dictionary] = []
+	for i in range(0, ink_points.size(), point_skip):
+		var point = ink_points[i]
+		var current_size = point.get_current_size(current_time)
+
+		if current_size < 1.0:
+			continue
+
+		var circle_poly = create_circle_polygon(point.position, current_size)
+		paint_circles.append({
+			"polygon": circle_poly,
+			"center": point.position,
+			"radius": current_size
+		})
+
+	if paint_circles.is_empty():
+		print("PaintCollisionManager: No paint for final crush")
+		return
+
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	var crushed_count = 0
+
+	# check each enemy against all paint circles
+	for enemy in enemies:
+		if not is_instance_valid(enemy):
+			continue
+
+		for circle_data in paint_circles:
+			if enemy.has_method("does_enemy_overlap_polygon"):
+				if enemy.does_enemy_overlap_polygon(circle_data.polygon):
+					enemy.crunch()
+					crushed_count += 1
+					break
+
+	print("PaintCollisionManager: Final crush - destroyed %d enemies" % crushed_count)
+
+
+func _on_ult_activated():
+	is_ult_active = true
+	print("PaintCollisionManager: ult active - coll creation disabled")
+
+
+func _on_ult_deactivated():
+	is_ult_active = false
+	crush_all_enemies_under_paint()  # final crush
+	print("PaintCollisionManager: ult ended - coll creation re-enabled")
 
 
 func _exit_tree():

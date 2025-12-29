@@ -19,3 +19,4 @@
 - manuell testen ob fun ist und nicht irgendwann breaked!
 - web build nochmal testen
 - tutorial
+- player death behaviour

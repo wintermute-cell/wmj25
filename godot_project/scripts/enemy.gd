@@ -182,6 +182,12 @@ func crunch():
 	GameManager.add_score(points)
 
 	GameManager.sound_enemy_died()
+
+	# award ult charge to player
+	var player_node = get_tree().get_first_node_in_group("player")
+	if player_node and player_node.has_method("add_ult_charge"):
+		player_node.add_ult_charge(player_node.ult_charge_per_kill)
+
 	# add camera shake on death
 	CameraShake.add_trauma(0.3)
 
