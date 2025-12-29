@@ -92,6 +92,15 @@ func _physics_process(delta: float):
 	else:
 		velocity = Vector2.ZERO
 
+	# flip sprite based on movement direction
+	if velocity.x < 0:
+		$AnimatedSpriteBasic.flip_h = true
+		$AnimatedSpriteDasher.flip_h = true
+	elif velocity.x >= 0:
+		$AnimatedSpriteBasic.flip_h = false
+		$AnimatedSpriteDasher.flip_h = false
+
+
 	# move with collision
 	move_and_slide()
 
@@ -124,7 +133,6 @@ func change_enemy_type(new_type: int):
 		enemy_type = EnemyType.DASHER
 		speed = 50.0
 		damage_per_second = 30.0
-		scale = Vector2.ONE * 2.0
 		$AnimatedSpriteBasic.hide()
 		$AnimatedSpriteDasher.show()
 
